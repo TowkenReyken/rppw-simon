@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supermercado Simón</title>
+    <link rel="stylesheet" href="/css/carrusel.css">
+</head>
+<body>
+    <%- include('partials/header') %> <!-- Importa el header con los estilos -->
+    
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide"><img src="/img/carrusel1.jpg" alt="Promoción 1"></div>
+          <div class="swiper-slide"><img src="/img/carrusel2.jpg" alt="Promoción 2"></div>
+          <div class="swiper-slide"><img src="/img/carrusel3.jpg" alt="Promoción 3"></div>
+        </div>
+      
+        <!-- Botones de navegación -->
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-pagination"></div>
+      </div>
+      
+
+      <script src="/js/carrusel.js"></script>
+</body>
+</html>
