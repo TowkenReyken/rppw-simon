@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supermercado Simón</title>
     <link rel="stylesheet" href="/css/carrusel.css">
+    <link rel="stylesheet" href="/css/productos-inicio.css">
+    <link rel="stylesheet" href="/css/sorteo.css">
 </head>
 <body>
-    <%- include('partials/header') %> <!-- Importa el header con los estilos -->
+    <%- include('partials/header') %>
     
     <div class="swiper mySwiper">
         <div class="swiper-wrapper">
@@ -16,14 +18,82 @@
           <div class="swiper-slide"><img src="/img/carrusel-simon-carniceria.jpg" alt="Promoción 3"></div>
         </div>
       
-        <!-- Botones de navegación -->
         <div class="swiper-button-next"></div>
         <div class="swiper-button-prev"></div>
         <div class="swiper-pagination"></div>
-      </div>
-      
-      <%- include('partials/footer') %>
+      </div>  
 
-      <script src="/js/carrusel.js"></script>
+      <section class="sorteo">
+        <div class="sorteo-container">
+            <img src="/img/sorteo.jpg" alt="Sorteo Supermercado Simón">
+            <div class="sorteo-info">
+                <h2>🎉 ¡Participa en nuestro Gran Sorteo!</h2>
+                <p>Compra en Supermercado Simón y gana <b>premios increíbles</b>.  
+                ¡Solo tienes que realizar una compra de RD$1,000 o más y entrarás automáticamente en el sorteo!</p>
+                <input type="datetime-local" id="fechaSorteo">
+              <p>Tiempo restante: <strong><span id="contador">--d --h --m --s</span></strong></p>
+            </div>
+        </div>
+    </section>
+
+    <section class="productos-destacados">
+      <div class="hero-content">
+          <h1>Hecha un vistazo a los productos más destacados del Supermercado Simón!</h1>
+      </div>
+  
+      <h2>Productos en Descuento</h2>
+      <div class="productos-grid">
+          <div class="producto">
+              <img src="/img/temporal-arroz.avif" alt="Arroz en Oferta">
+              <h3>Arroz Premium</h3>
+              <p class="precio"><span class="precio-antiguo">$500</span> $350</p>
+              <a href="#" class="boton-ver-mas">Ver más</a>
+          </div>
+          <div class="producto">
+              <img src="/img/temporal-refresco.jpg" alt="Refresco en Oferta">
+              <h3>Refresco Familiar</h3>
+              <p class="precio"><span class="precio-antiguo">$400</span> $280</p>
+              <a href="#" class="boton-ver-mas">Ver más</a>
+          </div>
+      </div>
+  
+      <h2>Más Vendidos</h2>
+      <div class="productos-grid">
+          <div class="producto">
+              <img src="/img/temporal-arroz.avif" alt="Arroz más vendido">
+              <h3>Arroz Premium</h3>
+              <p class="precio">$700</p>
+              <a href="#" class="boton-ver-mas">Ver más</a>
+          </div>
+          <div class="producto">
+              <img src="/img/temporal-refresco.jpg" alt="Refresco más vendido">
+              <h3>Refresco Familiar</h3>
+              <p class="precio">$950</p>
+              <a href="#" class="boton-ver-mas">Ver más</a>
+          </div>
+      </div>
+  
+      <h2>Nuevos Productos</h2>
+      <div class="productos-grid">
+          <div class="producto">
+              <img src="/img/temporal-arroz.avif" alt="Nuevo Arroz">
+              <h3>Arroz Integral</h3>
+              <p class="precio">$600</p>
+              <a href="#" class="boton-ver-mas">Ver más</a>
+          </div>
+          <div class="producto">
+              <img src="/img/temporal-refresco.jpg" alt="Nuevo Refresco">
+              <h3>Refresco Zero</h3>
+              <p class="precio">$850</p>
+              <a href="#" class="boton-ver-mas">Ver más</a>
+          </div>
+      </div>
+  </section>  
+      
+    <%- include('partials/footer') %>
+
+    <script src="/js/carrusel.js"></script>
+    <script src="/js/sorteo.js"></script>
+    <script src="/js/carrusel-productos-inicio.js"></script>
 </body>
 </html>

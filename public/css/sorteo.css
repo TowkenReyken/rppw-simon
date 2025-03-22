@@ -1,0 +1,47 @@
+.sorteo {
+    background: #ffcc00;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.sorteo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.sorteo-container img {
+    width: 300px;
+    border-radius: 10px;
+    margin-right: 20px;
+}
+
+.sorteo-info {
+    text-align: left;
+    max-width: 500px;
+}
+
+.sorteo-info h2 {
+    color: #d40000;
+}
+
+.boton-participar {
+    display: inline-block;
+    background: green;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.boton-participar:hover {
+    background: rgb(0, 107, 0);
+}

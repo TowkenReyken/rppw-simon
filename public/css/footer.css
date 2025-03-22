@@ -1,7 +1,6 @@
-/* Estilos generales del footer */
 footer {
-    background-color: #222;
-    color: white;
+    background-color: yellow;
+    color: black;
     padding: 20px 0;
     font-family: Arial, sans-serif;
     text-align: center;
@@ -17,6 +16,10 @@ footer {
 .footer-section {
     width: 30%;
     min-width: 250px;
+    background-color: rgba(0, 0, 0, 0.1); /* Fondo ligeramente más oscuro */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 15px; /* Espaciado interno */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra para dar efecto de caja */
 }
 
 .footer-section h3 {
@@ -24,7 +27,6 @@ footer {
     font-size: 1.2em;
 }
 
-/* Datos de contacto */
 .footer-section p {
     margin: 5px 0;
     display: flex;
@@ -47,7 +49,6 @@ footer {
     font-size: 1.5em;
 }
 
-/* Sección inferior del footer */
 .footer-bottom {
     margin-top: 20px;
     padding-top: 10px;

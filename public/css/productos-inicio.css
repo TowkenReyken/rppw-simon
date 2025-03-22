@@ -1,0 +1,77 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.productos-destacados {
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.hero-content {
+    background-color: red;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.hero-content h1 {
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.productos-destacados h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.productos-grid {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.producto {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+    width: 250px;
+    text-align: center;
+}
+
+.producto:hover {
+    transform: translateY(-10px);
+}
+
+.producto img {
+    width: 100%;
+    height: auto;
+    border-bottom: 1px solid #ddd;
+}
+
+.producto h3 {
+    margin: 10px 0;
+    font-size: 1.2em;
+    color: #333;
+}
+
+.producto .precio {
+    font-size: 1.1em;
+    color: #e74c3c;
+    margin: 10px 0;
+}
+
+.producto .precio-antiguo {
+    text-decoration: line-through;
+    color: #999;
+    margin-right: 10px;
+}

@@ -6,7 +6,7 @@ body {
 header {
     background-color: white;
     color: white;
-    padding: 10px;
+    padding: 10px 20px;
     margin: 0;
     font-family: Arial, sans-serif;
     display: flex;
@@ -14,6 +14,17 @@ header {
     align-items: center;
     width: 100%;
     box-sizing: border-box;
+    position: relative;
+}
+
+header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background-color: black;
 }
 
 #logo {

@@ -1,15 +1,13 @@
 const express = require('express');
 const app = express();
+const path = require('path');
 const PORT = process.env.PORT || 3000;
 
-// Configurar EJS como motor de plantillas
 app.set('view engine', 'ejs');
-app.set('views', __dirname + '/views');
+app.set('views', path.join(__dirname, 'views'));
 
-// Servir archivos estáticos desde la carpeta public
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Ruta principal
 app.get('/', (req, res) => {
   // Ejemplo de datos para la tarjeta
   const cardData = {
@@ -19,6 +17,18 @@ app.get('/', (req, res) => {
   };
 
   res.render('index', { cardData });
+});
+
+app.get('/productos', (req, res) => {
+  res.render('productos');
+});
+
+app.get('/nosotros', (req, res) => {
+  res.render('nosotros');
+});
+
+app.get('/contacto', (req, res) => {
+  res.render('contacto');
 });
 
 app.listen(PORT, () => {
