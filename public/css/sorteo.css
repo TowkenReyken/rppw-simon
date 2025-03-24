@@ -1,47 +1,118 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
 .sorteo {
-    background: #ffcc00;
-    padding: 40px 20px;
+    padding: 20px;
     text-align: center;
+    background-color: #f9f9f9;
 }
 
 .sorteo-container {
     display: flex;
-    justify-content: center;
     align-items: center;
-    flex-wrap: wrap;
-    max-width: 900px;
-    margin: auto;
-    background: white;
+    justify-content: space-between;
+    background-color: yellow;
     border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    margin: 20px auto;
+    max-width: 1200px;
 }
 
 .sorteo-container img {
-    width: 300px;
+    width: 100%;
+    max-width: 400px;
     border-radius: 10px;
     margin-right: 20px;
 }
 
 .sorteo-info {
     text-align: left;
-    max-width: 500px;
+    width: 100%;
+    max-width: 600px;
 }
 
 .sorteo-info h2 {
-    color: #d40000;
+    font-size: 2em;
+    color: #e74c3c;
+    margin-bottom: 10px;
 }
 
-.boton-participar {
-    display: inline-block;
-    background: green;
-    color: white;
-    padding: 10px 20px;
-    text-decoration: none;
+.sorteo-info p {
+    font-size: 1.2em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.sorteo-info input[type="datetime-local"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
     border-radius: 5px;
-    margin-top: 10px;
 }
 
-.boton-participar:hover {
-    background: rgb(0, 107, 0);
+.sorteo-info #contador {
+    font-size: 1.5em;
+    color: #e74c3c;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .sorteo-container {
+        flex-direction: column;
+        padding: 15px;
+        max-width: 90%;
+    }
+
+    .sorteo-container img {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+
+    .sorteo-info {
+        text-align: center;
+    }
+
+    .sorteo-info h2 {
+        font-size: 1.6em;
+    }
+
+    .sorteo-info p {
+        font-size: 1em;
+    }
+
+    .sorteo-info input[type="datetime-local"] {
+        padding: 8px;
+    }
+
+    .sorteo-info #contador {
+        font-size: 1.3em;
+    }
+}
+
+@media (max-width: 480px) {
+    .sorteo-container {
+        padding: 10px;
+        max-width: 95%;
+    }
+
+    .sorteo-info h2 {
+        font-size: 1.4em;
+    }
+
+    .sorteo-info p {
+        font-size: 0.9em;
+    }
+
+    .sorteo-info input[type="datetime-local"] {
+        padding: 6px;
+    }
+
+    .sorteo-info #contador {
+        font-size: 1.1em;
+    }
 }

@@ -64,3 +64,29 @@ form input, form textarea {
 .btn-enviar:hover {
     background-color: #219150;
 }
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .contacto-container {
+        padding: 10px;
+    }
+
+    form label, form input, form textarea {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .contacto-container h1 {
+        font-size: 2em;
+    }
+
+    .contacto-container p {
+        font-size: 1em;
+    }
+
+    .btn-enviar {
+        width: 100%;
+        padding: 15px;
+    }
+}
