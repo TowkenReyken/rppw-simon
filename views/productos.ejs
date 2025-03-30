@@ -1,48 +1,83 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Productos | Supermercado Simón</title>
-    <link rel="stylesheet" href="/css/productos.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Productos | Supermercado Simón</title>
+  <link rel="stylesheet" href="/css/productos.css">
 </head>
 <body>
-    <%- include('partials/header') %>
+  <%- include('partials/header') %>
 
-    <section class="productos-container">
-        <h1>Nuestros Productos</h1>
-        <button class="btn-agregar" onclick="abrirFormulario()">Agregar Producto</button>
-        
-        <div class="productos-grid" id="productosGrid">
-            <!-- Aquí se insertarán las tarjetas de productos dinámicamente -->
+  <section class="productos-container">
+    <h1>Nuestros Productos</h1>
+    <button class="btn-agregar" onclick="abrirFormulario()">Agregar Producto</button>
+    
+    <div class="productos-grid" id="productosGrid">
+      <!-- Ejemplo de tarjeta de producto -->
+      <div class="producto-card" data-id="1">
+        <img src="/img/temporal-arroz.avif" alt="Arroz Premium">
+        <h3>Arroz Premium</h3>
+        <p class="precio">
+          <span class="precio-antiguo">$500</span> $350
+        </p>
+        <p class="producto-propiedades">Categoría: Cereales</p>
+        <div class="cantidad-controls">
+          <button class="btn-decrement">-</button>
+          <span class="cantidad">1</span>
+          <button class="btn-increment">+</button>
         </div>
-    </section>
-
-    <!-- Formulario para agregar producto -->
-    <div id="modalProducto" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="cerrarFormulario()">&times;</span>
-            <h2>Agregar Producto</h2>
-            <form id="formProducto">
-                <label for="nombre">Nombre del producto:</label>
-                <input type="text" id="nombre" required>
-
-                <label for="precio">Precio:</label>
-                <input type="number" id="precio" required>
-
-                <label for="descuento">Descuento (%):</label>
-                <input type="number" id="descuento" value="0" required>
-
-                <label for="imagen">Imagen (URL o archivo):</label>
-                <input type="text" id="imagen" required>
-
-                <button type="submit" class="btn-guardar">Guardar</button>
-            </form>
+        <button class="btn-add-cart">Añadir al carrito</button>
+      </div>
+      
+      <div class="producto-card" data-id="2">
+        <img src="/img/temporal-refresco.jpg" alt="Refresco Familiar">
+        <h3>Refresco Familiar</h3>
+        <p class="precio">
+          <span class="precio-antiguo">$400</span> $280
+        </p>
+        <p class="producto-propiedades">Categoría: Bebidas</p>
+        <div class="cantidad-controls">
+          <button class="btn-decrement">-</button>
+          <span class="cantidad">1</span>
+          <button class="btn-increment">+</button>
         </div>
+        <button class="btn-add-cart">Añadir al carrito</button>
+      </div>
+      <!-- Agrega más tarjetas según necesites -->
     </div>
+  </section>
 
-    <%- include('partials/footer') %>
+<!-- Modal para agregar producto -->
+<div id="modalProducto" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="cerrarFormulario()">&times;</span>
+        <h2>Agregar Producto</h2>
+        <form id="formProducto">
+            <label for="nombre">Nombre del producto:</label>
+            <input type="text" id="nombre" placeholder="Ej: Arroz Premium" required>
 
-    <script src="/js/productos.js"></script>
+            <label for="precio">Precio:</label>
+            <input type="number" id="precio" placeholder="Ej: 350" required>
+
+            <label for="descuento">Descuento (%):</label>
+            <input type="number" id="descuento" value="0" placeholder="Ej: 10" required>
+
+            <label for="categoria">Categoría:</label>
+            <input type="text" id="categoria" placeholder="Ej: Vegetales, Carnes, Lácteos" required>
+
+            <label for="imagen">Imagen (URL):</label>
+            <input type="text" id="imagen" placeholder="Ej: https://example.com/imagen.jpg" required>
+
+            <button type="submit" class="btn-guardar">Guardar</button>
+        </form>
+    </div>
+</div>
+
+  <%- include('partials/footer') %>
+
+  <!-- Cargar los scripts -->
+  <script src="/js/productos.js"></script>
+  <script src="/js/carrito.js"></script>
 </body>
 </html>

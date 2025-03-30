@@ -1,58 +1,49 @@
-document.addEventListener("DOMContentLoaded", () => {
-    cargarProductos();
-});
-
-let productos = [
-    { nombre: "Arroz", precio: 500, descuento: 10, imagen: "/img/temporal-arroz.avif" },
-    { nombre: "Refresco", precio: 400, descuento: 5, imagen: "/img/temporal-refresco.jpg" }
-];
-
-// Función para calcular el precio con descuento
-function calcularPrecioDescuento(precio, descuento) {
-    return (precio - (precio * (descuento / 100))).toFixed(2);
-}
-
-// Función para cargar los productos en la página
-function cargarProductos() {
-    const productosGrid = document.getElementById("productosGrid");
-    productosGrid.innerHTML = "";
-
-    productos.forEach((producto, index) => {
-        const productoHTML = `
-            <div class="producto-card">
-                <img src="${producto.imagen}" alt="${producto.nombre}">
-                <h3>${producto.nombre}</h3>
-                <p class="precio">
-                    ${producto.descuento > 0 ? `<span class="precio-antiguo">$${producto.precio}</span>` : ""}
-                    $${calcularPrecioDescuento(producto.precio, producto.descuento)}
-                </p>
-            </div>
-        `;
-        productosGrid.innerHTML += productoHTML;
-    });
-}
-
-// Abrir formulario modal
+// Abrir el formulario modal
 function abrirFormulario() {
-    document.getElementById("modalProducto").style.display = "block";
+    const modal = document.getElementById("modalProducto");
+    modal.style.display = "flex";
 }
 
-// Cerrar formulario modal
+// Cerrar el formulario modal
 function cerrarFormulario() {
-    document.getElementById("modalProducto").style.display = "none";
+    const modal = document.getElementById("modalProducto");
+    modal.style.display = "none";
 }
 
-// Agregar producto desde el formulario
-document.getElementById("formProducto").addEventListener("submit", (event) => {
+// Cerrar el modal al hacer clic fuera del contenido
+window.onclick = function (event) {
+    const modal = document.getElementById("modalProducto");
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+};
+
+// Manejar el envío del formulario
+document.getElementById("formProducto").addEventListener("submit", function (event) {
     event.preventDefault();
 
-    let nombre = document.getElementById("nombre").value;
-    let precio = parseFloat(document.getElementById("precio").value);
-    let descuento = parseFloat(document.getElementById("descuento").value);
-    let imagen = document.getElementById("imagen").value;
+    // Obtener los valores del formulario
+    const nombre = document.getElementById("nombre").value;
+    const precio = document.getElementById("precio").value;
+    const descuento = document.getElementById("descuento").value;
+    const categoria = document.getElementById("categoria").value;
+    const imagen = document.getElementById("imagen").value;
 
-    productos.push({ nombre, precio, descuento, imagen });
+    // Aquí puedes agregar la lógica para guardar el producto
+    console.log({
+        nombre,
+        precio,
+        descuento,
+        categoria,
+        imagen,
+    });
 
-    cargarProductos();
+    // Cerrar el formulario después de guardar
     cerrarFormulario();
+});
+
+// Asegúrate de que el modal esté oculto al cargar la página
+document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("modalProducto");
+    modal.style.display = "none"; // Ocultar el modal al cargar
 });

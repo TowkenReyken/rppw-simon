@@ -26,7 +26,7 @@ body {
 
 .intro-box h1 {
     font-size: 2.5em;
-    color: green;
+    color: #e74c3c;
     margin-bottom: 10px;
 }
 
@@ -78,4 +78,30 @@ body {
     content: "✔️";
     margin-right: 10px;
     color: #e74c3c;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .info-sections {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .info-box {
+        max-width: 80%;
+    }
+}
+
+@media (max-width: 480px) {
+    .info-box {
+        max-width: 100%;
+    }
+
+    .intro-box h1 {
+        font-size: 2em;
+    }
+
+    .intro-box p {
+        font-size: 1em;
+    }
 }

@@ -1,0 +1,106 @@
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* Estilos del slider */
+.section-productos-inicio {
+    padding: 40px 0;
+    background-color: #f8f8f8;
+}
+
+.section-productos-inicio .swiper {
+    width: 100%;
+    padding: 20px;
+}
+
+.section-productos-inicio .swiper-wrapper {
+    display: flex;
+}
+
+.section-productos-inicio .swiper-slide {
+    display: flex;
+    justify-content: center;
+}
+
+/* Estilos de las tarjetas */
+.card-item {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+    max-width: 300px;
+}
+
+.card-item:hover {
+    transform: scale(1.05);
+}
+
+.card-link {
+    text-decoration: none;
+    color: #333;
+}
+
+.card-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.card-price {
+    font-size: 1.1rem;
+    color: #ff5722;
+}
+
+.precio-antiguo {
+    text-decoration: line-through;
+    color: #888;
+    margin-right: 5px;
+}
+
+.section-productos-inicio .swiper-button-prev,
+.section-productos-inicio .swiper-button-next {
+    color: #333;
+}
+
+.section-productos-inicio .swiper-pagination {
+    position: relative;
+    margin-top: 10px;
+}
+
+/* Ya te había dado estos estilos previos para los botones de navegación */
+.card-wrapper .swiper-button-prev, .card-wrapper .swiper-button-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    z-index: 10;
+}
+
+.card-wrapper .swiper-button-prev {
+    left: 10px;
+}
+
+.card-wrapper .swiper-button-next {
+    right: 10px;
+}

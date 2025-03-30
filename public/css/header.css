@@ -30,43 +30,57 @@ header::after {
 #logo {
     width: 120px;
     height: 50px;
-    margin-left: 20px;
-}
-
-#Perfil {
-    width: 50px;
-    height: 50px;
-}
-
-.bx {
-    margin-top: 5px;
-    font-size: 30px;
-    color: black;
-    margin-right: 15px;
-}
-
-.bx:hover {
-    color: rgb(172, 1, 1);
-    cursor: pointer;
 }
 
 #botones {
     display: flex;
-    border-radius: 10px;
-    padding: 2px;
+    align-items: center; /* Alinear verticalmente los íconos */
+    gap: 15px; /* Espaciado entre los íconos */
 }
 
-header h1 {
-    margin: 0;
-    font-size: 2.5em;
+.bx {
+    font-size: 30px; /* Tamaño uniforme para los íconos */
+    color: black;
+    cursor: pointer; /* Cambiar el cursor al pasar sobre los íconos */
+    transition: color 0.3s; /* Transición suave para el hover */
+}
+
+.bx:hover {
+    color: rgb(172, 1, 1); /* Cambiar el color al pasar el mouse */
+}
+
+#menu-icon {
+    display: none;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.container-cart-icon {
+    position: relative; /* Para posicionar el contador */
+    display: flex;
+    align-items: center; /* Alinear verticalmente el ícono del carrito */
+}
+
+.count-products {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: #e74c3c;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 header nav {
     margin: 0;
     display: flex;
     align-items: center;
-    margin-left: auto;
-    border-radius: 15px;
 }
 
 header nav ul {
@@ -104,9 +118,80 @@ header nav ul li a:hover {
     text-decoration: none;
 }
 
-header nav img {
-    margin-left: 15px;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
+#nav-links {
+    display: flex;
+}
+
+.nav-active {
+    display: block;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 10px;
+    z-index: 1000;
+}
+
+.nav-active ul {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.nav-active ul li {
+    margin: 10px 0;
+}
+
+.nav-active ul li:not(:last-child)::after {
+    content: none;
+}
+
+.search-box {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 10px;
+    z-index: 1000;
+}
+
+.search-box input {
+    width: 200px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    #menu-icon {
+        display: block;
+    }
+
+    header nav {
+        display: none;
+    }
+
+    .nav-active {
+        display: flex;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 2em;
+    }
+
+    header nav ul li a {
+        font-size: 1em;
+    }
+
+    .bx {
+        font-size: 25px; /* Ajustar el tamaño de los íconos en pantallas pequeñas */
+    }
 }
