@@ -2,26 +2,43 @@
   <link rel="stylesheet" href="/css/header.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+  <link rel="stylesheet" href="/css/carrito.css">
   <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 </head>
 
 <header>
   <a href="/"><img id="logo" src="/img/logo.png" alt="Logo"></a>
   <nav>
-      <ul id="nav-links">
-          <li><a href="/">Inicio</a></li>
-          <li><a href="/productos">Productos</a></li>
-          <li><a href="/nosotros">Nosotros</a></li>
-          <li><a href="/contacto">Contacto</a></li>
-      </ul>
+    <ul id="nav-links">
+      <li><a href="/">Inicio</a></li>
+      <li><a href="/productos">Productos</a></li>
+      <li><a href="/nosotros">Nosotros</a></li>
+      <li><a href="/contacto">Contacto</a></li>
+    </ul>
   </nav>
   <div id="botones">
-      <i class='bx bx-menu' id="menu-icon"></i>
-      <i class='bx bx-search-alt-2' id="search-icon"></i>
-      <i class='bx bx-cart-add'></i>      
-      <i class='bx bx-user'></i>
+    <i class='bx bx-menu' id="menu-icon"></i>
+    <i class='bx bx-search-alt-2' id="search-icon"></i>
+    <!-- Icono de carrito envuelto en un contenedor para detectar clicks -->
+    <div class="container-cart-icon">
+      <i class='bx bx-cart-add icon-cart'></i>
+      <div class="count-products"><span id="contador-productos">0</span></div>
+    </div>
+    <i class='bx bx-user'></i>
   </div>
 </header>
+
+<!-- Carrito emergente -->
+<div class="container-cart-products hidden-cart">
+  <div class="row-product hidden"></div>
+  <div class="cart-total hidden">
+    <h3>Total:</h3>
+    <span class="total-pagar">$0</span>
+  </div>
+  <p class="cart-empty">El carrito está vacío</p>
+  <!-- Botón para realizar la compra (se puede ubicar aquí) -->
+  <button onclick="realizarCompra()">Comprar</button>
+</div>
 
 <div id="search-box" class="search-box">
   <input type="text" placeholder="Buscar...">
