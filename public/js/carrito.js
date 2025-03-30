@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Seleccionar elementos del carrito
     const btnCartIcon = document.querySelector('.container-cart-icon');
     const containerCartProducts = document.querySelector('.container-cart-products');
     const rowProduct = document.querySelector('.row-product');
@@ -10,17 +9,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let allProducts = [];
 
-    // Mostrar/Ocultar el carrito emergente
+    // Mostrar/Ocultar el carrito
     if (btnCartIcon) {
         btnCartIcon.addEventListener('click', () => {
             containerCartProducts.classList.toggle('hidden-cart');
+            console.log('Carrito toggled');
         });
-    } else {
-        console.error("No se encontró el elemento .container-cart-icon");
     }
 
-    // Función para actualizar el carrito en la interfaz
+    // Actualizar el carrito
     function updateCart() {
+        console.log('Actualizando carrito...', allProducts);
+
         if (allProducts.length === 0) {
             cartEmpty.classList.remove('hidden');
             rowProduct.classList.add('hidden');
@@ -31,97 +31,80 @@ document.addEventListener('DOMContentLoaded', () => {
             cartTotal.classList.remove('hidden');
         }
 
-        // Limpiar el contenedor del carrito
         rowProduct.innerHTML = '';
         let total = 0;
         let totalItems = 0;
+
         allProducts.forEach(product => {
+            const finalPrice = product.price - (product.price * (product.discount / 100));
             const productDiv = document.createElement('div');
             productDiv.classList.add('cart-product');
             productDiv.innerHTML = `
                 <div class="info-cart-product">
-                    <span class="cantidad-producto-carrito">${product.quantity}</span>
+                    <span class="cantidad-producto-carrito">${product.quantity}x</span>
                     <p class="titulo-producto-carrito">${product.title}</p>
-                    <span class="precio-producto-carrito">$${(product.price * product.quantity).toFixed(2)}</span>
+                    <span class="precio-producto-carrito">$${(finalPrice * product.quantity).toFixed(2)}</span>
+                    <div class="cantidad-controls">
+                        <button class="btn-decrement" data-title="${product.title}">-</button>
+                        <span class="cantidad">${product.quantity}</span>
+                        <button class="btn-increment" data-title="${product.title}">+</button>
+                    </div>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-close">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-close" data-title="${product.title}">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             `;
             rowProduct.appendChild(productDiv);
-            total += product.price * product.quantity;
+            total += finalPrice * product.quantity;
             totalItems += product.quantity;
         });
+
         totalPagar.innerText = `$${total.toFixed(2)}`;
         countProducts.innerText = totalItems;
     }
 
-    // Agregar producto al carrito desde las tarjetas
-    document.querySelectorAll('.btn-add-cart').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const card = e.target.closest('.producto-card');
-            const title = card.querySelector('h3').textContent;
-            const priceText = card.querySelector('.precio').textContent;
-            const price = parseFloat(priceText.replace('$', '').trim());
-            const quantitySpan = card.querySelector('.cantidad');
-            let quantity = quantitySpan ? parseInt(quantitySpan.textContent) : 1;
-            
-            // Si el producto ya existe, se actualiza la cantidad
-            const exists = allProducts.some(product => product.title === title);
-            if (exists) {
-                allProducts = allProducts.map(product => {
-                    if (product.title === title) {
-                        product.quantity += quantity;
-                    }
-                    return product;
-                });
+    // Agregar producto
+    document.querySelectorAll('.btn-add-cart').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const productCard = e.target.closest('.producto-card');
+            const title = productCard.querySelector('h3').textContent;
+            const price = parseFloat(productCard.querySelector('.precio').textContent.replace('$', ''));
+
+            const existingProduct = allProducts.find(product => product.title === title);
+            if (existingProduct) {
+                existingProduct.quantity += 1;
             } else {
-                allProducts.push({ title, price, quantity });
+                allProducts.push({ title, price, discount: 0, quantity: 1 });
             }
+
+            console.log('Producto agregado:', title);
             updateCart();
         });
     });
 
-    // Controles de cantidad en cada tarjeta
-    document.querySelectorAll('.cantidad-controls').forEach(control => {
-        const decrementBtn = control.querySelector('.btn-decrement');
-        const incrementBtn = control.querySelector('.btn-increment');
-        const cantidadSpan = control.querySelector('.cantidad');
-        
-        decrementBtn.addEventListener('click', () => {
-            let qty = parseInt(cantidadSpan.textContent);
-            if (qty > 1) {
-                cantidadSpan.textContent = --qty;
+    // Incrementar o decrementar cantidad de productos
+    rowProduct.addEventListener('click', (e) => {
+        const title = e.target.dataset.title;
+        const product = allProducts.find(product => product.title === title);
+
+        if (e.target.classList.contains('btn-increment')) {
+            product.quantity += 1;
+        } else if (e.target.classList.contains('btn-decrement')) {
+            product.quantity -= 1;
+            if (product.quantity === 0) {
+                allProducts = allProducts.filter(product => product.title !== title);
             }
-        });
-        
-        incrementBtn.addEventListener('click', () => {
-            let qty = parseInt(cantidadSpan.textContent);
-            cantidadSpan.textContent = ++qty;
-        });
+        }
+
+        updateCart();
     });
 
     // Eliminar producto del carrito
     rowProduct.addEventListener('click', (e) => {
         if (e.target.classList.contains('icon-close')) {
-            const productDiv = e.target.closest('.cart-product');
-            const title = productDiv.querySelector('.titulo-producto-carrito').textContent;
+            const title = e.target.dataset.title;
             allProducts = allProducts.filter(product => product.title !== title);
             updateCart();
         }
     });
-
-    // Función para simular la compra
-    window.realizarCompra = function() {
-        if (allProducts.length === 0) {
-            alert('El carrito está vacío.');
-            return;
-        }
-        alert('¡Compra realizada con éxito!');
-        allProducts = [];
-        updateCart();
-    };
-
-    // Exponer updateCart para fines de depuración (opcional)
-    window.updateCart = updateCart;
 });

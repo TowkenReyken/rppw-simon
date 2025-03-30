@@ -34,24 +34,47 @@ header::after {
 
 #botones {
     display: flex;
-    align-items: center;
-    gap: 15px;
+    align-items: center; /* Alinear verticalmente los íconos */
+    gap: 15px; /* Espaciado entre los íconos */
 }
 
 .bx {
-    font-size: 30px;
+    font-size: 30px; /* Tamaño uniforme para los íconos */
     color: black;
+    cursor: pointer; /* Cambiar el cursor al pasar sobre los íconos */
+    transition: color 0.3s; /* Transición suave para el hover */
 }
 
 .bx:hover {
-    color: rgb(172, 1, 1);
-    cursor: pointer;
+    color: rgb(172, 1, 1); /* Cambiar el color al pasar el mouse */
 }
 
 #menu-icon {
     display: none;
     font-size: 30px;
     cursor: pointer;
+}
+
+.container-cart-icon {
+    position: relative; /* Para posicionar el contador */
+    display: flex;
+    align-items: center; /* Alinear verticalmente el ícono del carrito */
+}
+
+.count-products {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: #e74c3c;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 header nav {
@@ -169,6 +192,6 @@ header nav ul li a:hover {
     }
 
     .bx {
-        font-size: 25px;
+        font-size: 25px; /* Ajustar el tamaño de los íconos en pantallas pequeñas */
     }
 }

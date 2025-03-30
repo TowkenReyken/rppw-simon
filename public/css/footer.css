@@ -53,7 +53,7 @@ footer {
 .footer-bottom {
     margin-top: 20px;
     padding-top: 10px;
-    border-top: 1px solid gray;
+    border-top: 1px solid rgb(0, 0, 0);
 }
 
 .map-container {
@@ -85,6 +85,9 @@ footer {
 
     .footer-section {
         width: 80%;
+    }
+    .map-container {
+        max-width: 600px;
     }
 }
 

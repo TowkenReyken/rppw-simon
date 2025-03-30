@@ -19,12 +19,13 @@
   <div id="botones">
     <i class='bx bx-menu' id="menu-icon"></i>
     <i class='bx bx-search-alt-2' id="search-icon"></i>
-    <!-- Icono de carrito envuelto en un contenedor para detectar clicks -->
     <div class="container-cart-icon">
       <i class='bx bx-cart-add icon-cart'></i>
       <div class="count-products"><span id="contador-productos">0</span></div>
     </div>
-    <i class='bx bx-user'></i>
+    <a href="/inicio-registro-sesion">
+      <i class='bx bx-user' id="user-icon"></i>
+    </a>
   </div>
 </header>
 
@@ -36,7 +37,6 @@
     <span class="total-pagar">$0</span>
   </div>
   <p class="cart-empty">El carrito está vacío</p>
-  <!-- Botón para realizar la compra (se puede ubicar aquí) -->
   <button onclick="realizarCompra()">Comprar</button>
 </div>
 

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro e Inicio de Sesión</title>
+    <link rel="stylesheet" href="/css/inicio-registro-sesion.css">
+</head>
+<body>
+
+    <div class="contenedor">
+        <div class="form-box">
+            <h2 id="form-title">Iniciar Sesión</h2>
+
+            <form id="loginForm">
+                <div class="input-box">
+                    <input type="email" id="email" required>
+                    <label>Correo Electrónico</label>
+                </div>
+                <div class="input-box">
+                    <input type="password" id="password" required>
+                    <label>Contraseña</label>
+                </div>
+                <button type="submit" class="btn">Iniciar Sesión</button>
+                <p class="toggle-text">¿No tienes cuenta? <a href="#" id="toggleForm">Regístrate</a></p>
+            </form>
+
+            <form id="registerForm" class="hidden">
+                <div class="input-box">
+                    <input type="text" id="nombre" required>
+                    <label>Nombre Completo</label>
+                </div>
+                <div class="input-box">
+                    <input type="email" id="email-register" required>
+                    <label>Correo Electrónico</label>
+                </div>
+                <div class="input-box">
+                    <input type="password" id="password-register" required>
+                    <label>Contraseña</label>
+                </div>
+                <button type="submit" class="btn">Registrarse</button>
+                <p class="toggle-text">¿Ya tienes cuenta? <a href="#" id="toggleFormBack">Inicia Sesión</a></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/inicio-registro-sesion.js"></script>
+</body>
+</html>

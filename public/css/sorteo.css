@@ -14,7 +14,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: yellow;
+    background-color: rgb(231, 231, 0);
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;

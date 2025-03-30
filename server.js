@@ -15,7 +15,6 @@ app.get('/', (req, res) => {
     image: 'img/slider1.jpg',
     description: '¡Aprovecha los descuentos en nuestros productos!'
   };
-
   res.render('index', { cardData });
 });
 
@@ -31,9 +30,8 @@ app.get('/contacto', (req, res) => {
   res.render('contacto');
 });
 
-// Temporal
-app.get('/carrusel', (req, res) => {
-  res.render('carrusel');
+app.get("/inicio-registro-sesion", (req, res) => {
+  res.render("inicio-registro-sesion");
 });
 
 app.listen(PORT, () => {

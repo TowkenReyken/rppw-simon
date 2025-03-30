@@ -1,16 +1,49 @@
-// Funciones para abrir y cerrar el formulario de agregar producto
+// Abrir el formulario modal
 function abrirFormulario() {
-    document.getElementById("modalProducto").style.display = "block";
+    const modal = document.getElementById("modalProducto");
+    modal.style.display = "flex";
 }
 
+// Cerrar el formulario modal
 function cerrarFormulario() {
-    document.getElementById("modalProducto").style.display = "none";
+    const modal = document.getElementById("modalProducto");
+    modal.style.display = "none";
 }
 
-// Ejemplo: Capturar el envío del formulario
-document.getElementById("formProducto").addEventListener("submit", function(e) {
-    e.preventDefault();
-    // Lógica para agregar el producto (aquí se podría integrar con una base de datos)
-    alert("Producto agregado (simulación).");
+// Cerrar el modal al hacer clic fuera del contenido
+window.onclick = function (event) {
+    const modal = document.getElementById("modalProducto");
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+};
+
+// Manejar el envío del formulario
+document.getElementById("formProducto").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    // Obtener los valores del formulario
+    const nombre = document.getElementById("nombre").value;
+    const precio = document.getElementById("precio").value;
+    const descuento = document.getElementById("descuento").value;
+    const categoria = document.getElementById("categoria").value;
+    const imagen = document.getElementById("imagen").value;
+
+    // Aquí puedes agregar la lógica para guardar el producto
+    console.log({
+        nombre,
+        precio,
+        descuento,
+        categoria,
+        imagen,
+    });
+
+    // Cerrar el formulario después de guardar
     cerrarFormulario();
+});
+
+// Asegúrate de que el modal esté oculto al cargar la página
+document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("modalProducto");
+    modal.style.display = "none"; // Ocultar el modal al cargar
 });
