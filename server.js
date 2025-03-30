@@ -31,6 +31,11 @@ app.get('/contacto', (req, res) => {
   res.render('contacto');
 });
 
+// Temporal
+app.get('/carrusel', (req, res) => {
+  res.render('carrusel');
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
