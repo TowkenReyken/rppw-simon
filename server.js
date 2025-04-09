@@ -1,6 +1,12 @@
 // server.js
 require('dotenv').config(); // ✅ Cargar variables de entorno desde .env
 
+console.log(process.env.DB_USER); // Muestra el valor de la variable DB_USER
+console.log(process.env.DB_PASSWORD); // Muestra el valor de la variable DB_PASSWORD
+console.log(process.env.DB_SERVER); // Muestra el valor de la variable DB_SERVER
+console.log(process.env.DB_DATABASE); // Muestra el valor de la variable DB_DATABASE
+
+
 const express = require('express');
 const path = require('path');
 const bodyParser = require("body-parser");
