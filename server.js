@@ -1,10 +1,11 @@
 // server.js
+require('dotenv').config(); // ✅ Cargar variables de entorno desde .env
+
 const express = require('express');
 const path = require('path');
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const sql = require("mssql");
-require('dotenv').config(); // Para cargar variables de entorno en local
 
 const app = express();
 const PORT = process.env.PORT || 3000;
