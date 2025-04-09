@@ -18,8 +18,10 @@
   "homepage": "https://github.com/TowkenReyken/rppw-simon#readme",
   "description": "",
   "dependencies": {
+    "cors": "^2.8.5",
     "ejs": "^3.1.10",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "mssql": "^11.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

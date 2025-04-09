@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let allProducts = [];
 
-    // Mostrar/Ocultar el carrito
     if (btnCartIcon) {
         btnCartIcon.addEventListener('click', () => {
             containerCartProducts.classList.toggle('hidden-cart');
@@ -17,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Actualizar el carrito
+    // Función para actualizar el carrito en la interfaz
     function updateCart() {
         console.log('Actualizando carrito...', allProducts);
 
@@ -63,43 +62,41 @@ document.addEventListener('DOMContentLoaded', () => {
         countProducts.innerText = totalItems;
     }
 
-    // Agregar producto
-    document.querySelectorAll('.btn-add-cart').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const productCard = e.target.closest('.producto-card');
-            const title = productCard.querySelector('h3').textContent;
-            const price = parseFloat(productCard.querySelector('.precio').textContent.replace('$', ''));
+    window.agregarProductoAlCarrito = function(productCard) {
+        const title = productCard.querySelector('h3').textContent;
+        const priceText = productCard.querySelector('.precio').textContent;
+        const price = parseFloat(priceText.replace('$', '').split(" ")[0]);
+        const quantityElement = productCard.querySelector('.cantidad');
+        let quantity = quantityElement ? parseInt(quantityElement.textContent) : 1;
+        const discount = parseFloat(productCard.getAttribute('data-descuento')) || 0;
 
-            const existingProduct = allProducts.find(product => product.title === title);
-            if (existingProduct) {
-                existingProduct.quantity += 1;
-            } else {
-                allProducts.push({ title, price, discount: 0, quantity: 1 });
-            }
+        const existingProduct = allProducts.find(product => product.title === title);
+        if (existingProduct) {
+            existingProduct.quantity += quantity;
+        } else {
+            allProducts.push({ title, price, discount, quantity });
+        }
 
-            console.log('Producto agregado:', title);
-            updateCart();
-        });
-    });
+        console.log('Producto agregado:', title);
+        updateCart();
+    };
 
-    // Incrementar o decrementar cantidad de productos
     rowProduct.addEventListener('click', (e) => {
         const title = e.target.dataset.title;
         const product = allProducts.find(product => product.title === title);
+        if (!product) return;
 
         if (e.target.classList.contains('btn-increment')) {
             product.quantity += 1;
         } else if (e.target.classList.contains('btn-decrement')) {
             product.quantity -= 1;
-            if (product.quantity === 0) {
-                allProducts = allProducts.filter(product => product.title !== title);
+            if (product.quantity <= 0) {
+                allProducts = allProducts.filter(p => p.title !== title);
             }
         }
-
         updateCart();
     });
 
-    // Eliminar producto del carrito
     rowProduct.addEventListener('click', (e) => {
         if (e.target.classList.contains('icon-close')) {
             const title = e.target.dataset.title;

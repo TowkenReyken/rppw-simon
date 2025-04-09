@@ -14,70 +14,110 @@
     <button class="btn-agregar" onclick="abrirFormulario()">Agregar Producto</button>
     
     <div class="productos-grid" id="productosGrid">
-      <!-- Ejemplo de tarjeta de producto -->
-      <div class="producto-card" data-id="1">
-        <img src="/img/temporal-arroz.avif" alt="Arroz Premium">
-        <h3>Arroz Premium</h3>
-        <p class="precio">
-          <span class="precio-antiguo">$500</span> $350
-        </p>
-        <p class="producto-propiedades">Categoría: Cereales</p>
-        <div class="cantidad-controls">
-          <button class="btn-decrement">-</button>
-          <span class="cantidad">1</span>
-          <button class="btn-increment">+</button>
-        </div>
-        <button class="btn-add-cart">Añadir al carrito</button>
-      </div>
-      
-      <div class="producto-card" data-id="2">
-        <img src="/img/temporal-refresco.jpg" alt="Refresco Familiar">
-        <h3>Refresco Familiar</h3>
-        <p class="precio">
-          <span class="precio-antiguo">$400</span> $280
-        </p>
-        <p class="producto-propiedades">Categoría: Bebidas</p>
-        <div class="cantidad-controls">
-          <button class="btn-decrement">-</button>
-          <span class="cantidad">1</span>
-          <button class="btn-increment">+</button>
-        </div>
-        <button class="btn-add-cart">Añadir al carrito</button>
-      </div>
-      <!-- Agrega más tarjetas según necesites -->
+      <!-- Las tarjetas de productos se cargarán dinámicamente aquí -->
     </div>
   </section>
 
-<!-- Modal para agregar producto -->
-<div id="modalProducto" class="modal">
+  <!-- Modal para agregar producto -->
+  <div id="modalProducto" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="cerrarFormulario()">&times;</span>
-        <h2>Agregar Producto</h2>
-        <form id="formProducto">
-            <label for="nombre">Nombre del producto:</label>
-            <input type="text" id="nombre" placeholder="Ej: Arroz Premium" required>
+      <span class="close" onclick="cerrarFormulario()">&times;</span>
+      <h2>Agregar Producto</h2>
+      <form id="formProducto">
+        <label for="nombre">Nombre del producto:</label>
+        <input type="text" id="nombre" placeholder="Ej: Arroz Premium" required>
 
-            <label for="precio">Precio:</label>
-            <input type="number" id="precio" placeholder="Ej: 350" required>
+        <label for="precio">Precio:</label>
+        <input type="number" id="precio" placeholder="Ej: 350" required>
 
-            <label for="descuento">Descuento (%):</label>
-            <input type="number" id="descuento" value="0" placeholder="Ej: 10" required>
+        <label for="descuento">Descuento (%):</label>
+        <input type="number" id="descuento" value="0" placeholder="Ej: 10" required>
 
-            <label for="categoria">Categoría:</label>
-            <input type="text" id="categoria" placeholder="Ej: Vegetales, Carnes, Lácteos" required>
+        <label for="categoria">Categoría:</label>
+        <input type="text" id="categoria" placeholder="Ej: Vegetales, Carnes, Lácteos" required>
 
-            <label for="imagen">Imagen (URL):</label>
-            <input type="text" id="imagen" placeholder="Ej: https://example.com/imagen.jpg" required>
+        <label for="imagen">Imagen (URL):</label>
+        <input type="text" id="imagen" placeholder="Ej: https://example.com/imagen.jpg" required>
 
-            <button type="submit" class="btn-guardar">Guardar</button>
-        </form>
+        <button type="submit" class="btn-guardar">Guardar</button>
+      </form>
     </div>
-</div>
+  </div>
 
   <%- include('partials/footer') %>
 
   <!-- Cargar los scripts -->
   <script src="/js/productos.js"></script>
   <script src="/js/carrito.js"></script>
+  <script>
+    // Función para cargar los productos dinámicamente desde la API
+    async function cargarProductos() {
+      try {
+        const response = await fetch("http://localhost:3000/api/productos");
+        const productos = await response.json();
+        const contenedor = document.getElementById("productosGrid");
+        contenedor.innerHTML = "";
+        productos.forEach(producto => {
+          const precioFinal = producto.precio - (producto.precio * (producto.descuento / 100));
+          const tarjeta = document.createElement("div");
+          tarjeta.classList.add("producto-card");
+          tarjeta.setAttribute("data-id", producto.id);
+          // Guardamos el descuento en un atributo data-descuento para que carrito.js lo pueda leer
+          tarjeta.setAttribute("data-descuento", producto.descuento);
+          tarjeta.innerHTML = `
+            <img src="${producto.imagen}" alt="${producto.nombre}">
+            <h3>${producto.nombre}</h3>
+            <p class="precio">${producto.descuento > 0 ? `<span class="precio-antiguo">$${producto.precio}</span>` : ""} $${precioFinal.toFixed(2)}</p>
+            <p class="producto-propiedades">Categoría: ${producto.categoria}</p>
+            <div class="cantidad-controls">
+              <button class="btn-decrement">-</button>
+              <span class="cantidad">1</span>
+              <button class="btn-increment">+</button>
+            </div>
+            <button class="btn-add-cart">Añadir al carrito</button>
+          `;
+          contenedor.appendChild(tarjeta);
+        });
+        // Agregar listeners a los nuevos controles de cantidad y botones de agregar al carrito
+        agregarListenersControles();
+      } catch (error) {
+        console.error("❌ Error al cargar productos:", error);
+      }
+    }
+
+    // Función para agregar listeners a controles de cantidad en tarjetas dinámicas
+    function agregarListenersControles() {
+      document.querySelectorAll('.cantidad-controls').forEach(control => {
+        const decrementBtn = control.querySelector('.btn-decrement');
+        const incrementBtn = control.querySelector('.btn-increment');
+        const cantidadSpan = control.querySelector('.cantidad');
+
+        decrementBtn.addEventListener('click', () => {
+          let qty = parseInt(cantidadSpan.textContent);
+          if (qty > 1) cantidadSpan.textContent = --qty;
+        });
+
+        incrementBtn.addEventListener('click', () => {
+          let qty = parseInt(cantidadSpan.textContent);
+          cantidadSpan.textContent = ++qty;
+        });
+      });
+
+      // Agregar listener a botones de agregar al carrito
+      document.querySelectorAll('.btn-add-cart').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const card = e.target.closest('.producto-card');
+          // Llamamos a la función global definida en carrito.js
+          if (typeof agregarProductoAlCarrito === 'function') {
+            agregarProductoAlCarrito(card);
+          } else {
+            console.warn('La función agregarProductoAlCarrito no está definida');
+          }
+        });
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", cargarProductos);
+  </script>
 </body>
 </html>

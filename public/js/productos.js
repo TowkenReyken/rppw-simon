@@ -19,30 +19,41 @@ window.onclick = function (event) {
 };
 
 // Manejar el envío del formulario
-document.getElementById("formProducto").addEventListener("submit", function (event) {
+document.getElementById("formProducto").addEventListener("submit", async function (event) {
     event.preventDefault();
 
     // Obtener los valores del formulario
     const nombre = document.getElementById("nombre").value;
     const precio = document.getElementById("precio").value;
-    const descuento = document.getElementById("descuento").value;
+    const descuento = document.getElementById("descuento").value || 0;
     const categoria = document.getElementById("categoria").value;
     const imagen = document.getElementById("imagen").value;
 
-    // Aquí puedes agregar la lógica para guardar el producto
-    console.log({
-        nombre,
-        precio,
-        descuento,
-        categoria,
-        imagen,
-    });
+    const producto = { nombre, precio, descuento, categoria, imagen };
 
-    // Cerrar el formulario después de guardar
-    cerrarFormulario();
+    try {
+        const response = await fetch("http://localhost:3000/api/productos", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(producto)
+        });
+
+        const data = await response.json();
+        alert(data.message);
+
+        cerrarFormulario();
+        document.getElementById("formProducto").reset();
+        // Recargar la lista de productos para incluir el nuevo
+        cargarProductos();
+    } catch (error) {
+        console.error("❌ Error al enviar datos:", error);
+        alert("Hubo un error al guardar el producto");
+    }
 });
 
-// Asegúrate de que el modal esté oculto al cargar la página
+// Asegurar que el modal esté oculto al cargar la página
 document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("modalProducto");
     modal.style.display = "none"; // Ocultar el modal al cargar

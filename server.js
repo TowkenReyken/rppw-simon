@@ -1,15 +1,25 @@
+// server.js
 const express = require('express');
 const app = express();
 const path = require('path');
 const PORT = process.env.PORT || 3000;
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const rutas = require('./routes/routes');
 
+app.use(cors());
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// API para productos
+app.use("/api", rutas);
+
+// Configurar EJS y vistas
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(express.static(path.join(__dirname, 'public')));
-
+// Rutas de vistas
 app.get('/', (req, res) => {
-  // Ejemplo de datos para la tarjeta
   const cardData = {
     title: 'Oferta del Día',
     image: 'img/slider1.jpg',
@@ -35,5 +45,5 @@ app.get("/inicio-registro-sesion", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
+  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
