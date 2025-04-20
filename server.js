@@ -4,7 +4,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const fetch = require('node-fetch'); // Asegúrate de que node-fetch esté instalado
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args)); // Importación compatible con node-fetch 3.x
 
 const app = express();
 const PORT = process.env.PORT || 3000;
