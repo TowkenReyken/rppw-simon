@@ -1,6 +1,6 @@
 <?php
 // Configuración de CORS
-header("Access-Control-Allow-Origin: http://localhost:3000"); // Permitir solicitudes desde localhost:3000
+header("Access-Control-Allow-Origin: *"); // Permitir solicitudes desde cualquier origen
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); // Métodos permitidos
 header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Encabezados permitidos
 
@@ -10,12 +10,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Configuración de la base de datos
-$host = 'aws-0-us-east-1.pooler.supabase.com';
-$dbname = 'postgres';
-$user = 'postgres.wukzuhcyiqzlzowcqsad';
-$password = 'sSU2fU3J9cQUOxow';
-$port = '6543';
+// Configuración de la base de datos usando variables de entorno
+$host = getenv('host') ?: 'aws-0-us-east-1.pooler.supabase.com';
+$dbname = getenv('dbname') ?: 'postgres';
+$user = getenv('user') ?: 'postgres.wukzuhcyiqzlzowcqsad';
+$password = getenv('password') ?: 'sSU2fU3J9cQUOxow';
+$port = getenv('db_port') ?: '6543';
 
 // Crear conexión con PDO
 try {
@@ -71,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+// Si el método no está permitido
 http_response_code(405);
 echo json_encode(["error" => "Método no permitido"]);
 ?>
