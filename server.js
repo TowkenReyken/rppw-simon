@@ -4,6 +4,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const fetch = require('node-fetch'); // Asegúrate de que node-fetch esté instalado
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,14 +30,19 @@ app.get('/', (req, res) => {
 // Ruta para obtener productos desde PHP
 app.get('/productos', async (req, res) => {
   try {
-    // Hacer una solicitud GET al servidor PHP
-    const response = await fetch('http://localhost:3001/src/productos.php');
+    // Hacer una solicitud GET al servidor PHP en Render
+    const response = await fetch('https://rppw-simon.onrender.com/src/productos.php');
+    
+    if (!response.ok) {
+      throw new Error(`Error en la solicitud a PHP: ${response.statusText}`);
+    }
+
     const productos = await response.json();
 
     // Renderizar la vista de productos con los datos obtenidos
     res.render('productos', { productos });
   } catch (error) {
-    console.error("Error al obtener productos desde PHP:", error);
+    console.error("Error al obtener productos desde PHP:", error.message);
     res.status(500).send("Error al obtener productos.");
   }
 });
