@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             // Enviar los datos al servidor PHP
-            const response = await fetch('http://localhost:3001/src/productos.php', {
+            const response = await fetch('https://rppw-simon.onrender.com/src/productos.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
