@@ -30,8 +30,8 @@ app.get('/', (req, res) => {
 // Ruta para obtener productos desde PHP
 app.get('/productos', async (req, res) => {
   try {
-    // Hacer una solicitud GET al servidor PHP en Render
-    const response = await fetch('https://ppw-simon-php.onrender.com/src/productos.php');
+    // Hacer una solicitud GET al servidor PHP local
+    const response = await fetch('http://localhost:3001/src/productos.php');
     
     if (!response.ok) {
       throw new Error(`Error en la solicitud a PHP: ${response.statusText}`);
