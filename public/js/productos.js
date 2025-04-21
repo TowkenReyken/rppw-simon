@@ -19,9 +19,25 @@ window.onclick = function (event) {
 };
 
 // Asegurar que el modal esté oculto al cargar la página
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const modal = document.getElementById("modalProducto");
     modal.style.display = "none"; // Ocultar el modal al cargar
+
+    // Cargar categorías dinámicamente
+    const categoriaSelect = document.getElementById("categoria");
+    try {
+        const response = await fetch('http://localhost:3001/src/categorias.php'); // Nueva ruta para obtener categorías
+        const categorias = await response.json();
+
+        categorias.forEach(categoria => {
+            const option = document.createElement("option");
+            option.value = categoria.id;
+            option.textContent = categoria.nombre;
+            categoriaSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error al cargar categorías:", error);
+    }
 
     // Manejar el envío del formulario
     const form = document.getElementById("formProducto");
@@ -32,17 +48,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const nombre = document.getElementById("nombre").value.trim();
         const precio = parseFloat(document.getElementById("precio").value);
         const descuento = parseInt(document.getElementById("descuento").value) || 0;
-        const categoria = document.getElementById("categoria").value.trim();
+        const stock = parseInt(document.getElementById("stock").value);
+        const categoria_id = parseInt(document.getElementById("categoria").value);
         const imagen = document.getElementById("imagen").value.trim();
 
         // Validar los datos
-        if (!nombre || !precio || !categoria || !imagen) {
+        if (!nombre || !precio || !categoria_id || !imagen || !stock) {
             alert("Todos los campos son obligatorios.");
             return;
         }
 
         // Crear el objeto del producto
-        const producto = { nombre, precio, descuento, categoria, imagen };
+        const producto = { nombre, precio, descuento, stock, categoria_id, imagen };
 
         try {
             // Enviar los datos al servidor PHP

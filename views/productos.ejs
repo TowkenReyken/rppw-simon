@@ -40,8 +40,13 @@
       <label for="descuento">Descuento (%):</label>
       <input type="number" id="descuento" value="0" placeholder="Ej: 10">
 
+      <label for="stock">Stock:</label>
+      <input type="number" id="stock" placeholder="Ej: 50" required>
+
       <label for="categoria">Categoría:</label>
-      <input type="text" id="categoria" placeholder="Ej: Vegetales, Carnes, Lácteos" required>
+      <select id="categoria" required>
+        <!-- Las opciones se llenarán dinámicamente desde la base de datos -->
+      </select>
 
       <label for="imagen">Imagen (URL):</label>
       <input type="text" id="imagen" placeholder="Ej: https://example.com/imagen.jpg" required>
