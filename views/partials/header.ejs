@@ -23,7 +23,6 @@
       <i class='bx bx-cart-add icon-cart'></i>
       <div class="count-products"><span id="contador-productos">0</span></div>
     </div>
-    <!-- El icono de usuario redirige a la página de registro/inicio de sesión -->
     <a href="/inicio-registro-sesion">
       <i class='bx bx-user' id="user-icon"></i>
     </a>
@@ -32,17 +31,29 @@
 
 <!-- Carrito emergente -->
 <div class="container-cart-products hidden-cart">
-  <div class="row-product hidden"></div>
+  <div class="row-product"></div>
   <div class="cart-total hidden">
     <h3>Total:</h3>
     <span class="total-pagar">$0</span>
+    <a href="/pago" class="btn-pagar">Pagar</a>
   </div>
   <p class="cart-empty">El carrito está vacío</p>
-  <button onclick="realizarCompra()">Comprar</button>
 </div>
 
 <div id="search-box" class="search-box">
-  <input type="text" placeholder="Buscar...">
+  <form id="search-form" action="/productos" method="GET">
+    <input 
+      type="text" 
+      name="q" 
+      id="search-input" 
+      placeholder="Buscar..." 
+      value="<%= typeof q !== 'undefined' ? q : '' %>" 
+      required>
+    <button type="submit" id="search-button">
+      <i class='bx bx-search-alt-2'></i>
+    </button>
+  </form>
 </div>
 
 <script src="/js/header.js"></script>
+<script src="/js/carrito.js"></script>

@@ -15,11 +15,22 @@
     
     <div class="productos-grid">
       <% productos.forEach(producto => { %>
-        <div class="producto-card">
+        <div class="producto-card" 
+             data-id="<%= producto.id %>" 
+             data-nombre="<%= producto.nombre %>" 
+             data-precio="<%= producto.precio %>" 
+             data-descuento="<%= producto.descuento %>" 
+             data-stock="<%= producto.stock %>" 
+             data-categoria="<%= producto.categoria %>" 
+             data-imagen="<%= producto.imagen %>">
           <img src="<%= producto.imagen %>" alt="<%= producto.nombre %>">
           <h3><%= producto.nombre %></h3>
           <p class="precio">Precio: $<%= (producto.precio - (producto.precio * (producto.descuento / 100))).toFixed(2) %></p>
           <p class="categoria">Categoría: <%= producto.categoria %></p>
+          <button class="btn-add-cart">Agregar al carrito</button>
+          <button class="btn-edit-product" onclick="abrirFormularioEdicion('<%= producto.id %>')">
+            <i class='bx bx-pencil'></i>
+          </button>
         </div>
       <% }) %>
     </div>
@@ -52,6 +63,38 @@
       <input type="text" id="imagen" placeholder="Ej: https://example.com/imagen.jpg" required>
 
       <button type="submit" class="btn-guardar">Guardar</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para editar producto -->
+<div id="modalEditarProducto" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="cerrarFormularioEdicion()">&times;</span>
+    <h2>Editar Producto</h2>
+    <form id="formEditarProducto">
+      <label for="editar-nombre">Nombre del producto:</label>
+      <input type="text" id="editar-nombre" placeholder="Ej: Arroz Premium" required>
+
+      <label for="editar-precio">Precio:</label>
+      <input type="number" id="editar-precio" placeholder="Ej: 350" required>
+
+      <label for="editar-descuento">Descuento (%):</label>
+      <input type="number" id="editar-descuento" value="0" placeholder="Ej: 10">
+
+      <label for="editar-stock">Stock:</label>
+      <input type="number" id="editar-stock" placeholder="Ej: 50" required>
+
+      <label for="editar-categoria">Categoría:</label>
+      <select id="editar-categoria" required>
+        <!-- Las opciones se llenarán dinámicamente desde la base de datos -->
+      </select>
+
+      <label for="editar-imagen">Imagen (URL):</label>
+      <input type="text" id="editar-imagen" placeholder="Ej: https://example.com/imagen.jpg" required>
+
+      <button type="submit" class="btn-guardar">Guardar Cambios</button>
+      <button type="button" class="btn-eliminar" onclick="eliminarProducto()">Eliminar Producto</button>
     </form>
   </div>
 </div>

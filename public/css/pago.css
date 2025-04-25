@@ -1,0 +1,44 @@
+.pago-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .pago-container h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .productos-pago table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .productos-pago th, .productos-pago td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .resumen-pago {
+    text-align: center;
+  }
+  
+  .resumen-pago h2 {
+    margin-bottom: 20px;
+  }
+  
+  #btn-confirmar-pago {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  #btn-confirmar-pago:hover {
+    background-color: #218838;
+  }

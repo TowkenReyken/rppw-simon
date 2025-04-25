@@ -49,11 +49,38 @@
     font-size: 16px;
 }
 
+/* Botones para aumentar/disminuir cantidad */
+.cantidad-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.cantidad-controls button {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.cantidad-controls button:hover {
+    background-color: #ddd;
+}
+
 /* Icono para eliminar producto */
 .icon-close {
     width: 25px;
     height: 25px;
     cursor: pointer;
+    transition: color 0.3s;
+}
+
+.icon-close:hover {
+    color: red;
 }
 
 /* Sección del total del carrito */
@@ -83,4 +110,22 @@
 .cart-empty {
     padding: 20px;
     text-align: center;
+    font-size: 16px;
+    color: #666;
+}
+
+.btn-pagar {
+    display: inline-block;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.btn-pagar:hover {
+    background-color: #0056b3;
 }

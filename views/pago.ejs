@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proceso de Pago | Supermercado Simón</title>
+  <link rel="stylesheet" href="/css/pago.css">
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <section class="pago-container">
+    <h1>Proceso de Pago</h1>
+    <div class="productos-pago">
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-productos">
+          <!-- Los productos se llenarán dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+    <div class="resumen-pago">
+      <h2>Total a Pagar: <span id="total-pago">$0</span></h2>
+      <button id="btn-confirmar-pago">Confirmar Compra</button>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+
+  <script src="/js/pago.js"></script>
+</body>
+</html>

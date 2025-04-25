@@ -54,7 +54,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding-bottom: 10px;
+    position: relative; /* Necesario para posicionar el botón de edición */
 }
 
 .producto-card:hover {
@@ -127,15 +127,39 @@ body {
     background-color: #27ae60;
     color: white;
     border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
+    padding: 10px 20px;
+    border-radius: 0 0 10px 10px; /* Redondear solo las esquinas inferiores */
     cursor: pointer;
     transition: background-color 0.3s;
-    margin-top: 5px;
+    position: absolute;
+    bottom: 0; /* Pegado al borde inferior */
+    left: 0;
+    width: 100%; /* Ocupa todo el ancho de la tarjeta */
 }
 
 .btn-add-cart:hover {
     background-color: #219150;
+}
+
+/* Botón de edición */
+.btn-edit-product {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: none;
+    color: white;
+    border: none;
+    padding: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-edit-product:hover {
+    background-color: #8b0000; /* Rojo oscuro al pasar el ratón */
 }
 
 /* Modal */
@@ -233,6 +257,24 @@ body {
 
 .close:hover {
     color: #e74c3c;
+}
+
+/* Ocultar productos no relacionados con la búsqueda */
+.producto-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.producto-card[style*="display: none"] {
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
 }
 
 /* Media Queries */

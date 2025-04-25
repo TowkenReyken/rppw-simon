@@ -30,17 +30,17 @@ app.get('/', (req, res) => {
 // Ruta para obtener productos desde PHP
 app.get('/productos', async (req, res) => {
   try {
-    // Hacer una solicitud GET al servidor PHP local
-    const response = await fetch('http://localhost:3001/src/productos.php');
-    
+    const searchQuery = req.query.q || ''; // Obtener el término de búsqueda (si existe)
+    const response = await fetch('http://localhost:3001/src/productos.php?q=' + encodeURIComponent(searchQuery));
+
     if (!response.ok) {
       throw new Error(`Error en la solicitud a PHP: ${response.statusText}`);
     }
 
     const productos = await response.json();
 
-    // Renderizar la vista de productos con los datos obtenidos
-    res.render('productos', { productos });
+    // Renderizar la vista de productos con los datos obtenidos y el término de búsqueda
+    res.render('productos', { productos, q: searchQuery });
   } catch (error) {
     console.error("Error al obtener productos desde PHP:", error.message);
     res.status(500).send("Error al obtener productos.");
@@ -48,6 +48,10 @@ app.get('/productos', async (req, res) => {
 });
 
 // Rutas adicionales
+app.get('/pago', (req, res) => {
+  res.render('pago');
+});
+
 app.get('/nosotros', (req, res) => {
   res.render('nosotros');
 });
