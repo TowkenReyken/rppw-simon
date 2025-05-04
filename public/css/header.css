@@ -148,23 +148,102 @@ header nav ul li a:hover {
     content: none;
 }
 
+/* Contenedor del buscador */
 .search-box {
-    display: none;
     position: absolute;
-    top: 60px;
+    top: 60px; /* Justo debajo del header */
     right: 20px;
+    width: 0;
+    overflow: hidden;
     background-color: white;
+    padding: 0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    padding: 10px;
+    border-radius: 5px;
     z-index: 1000;
+    transition: width 0.5s ease, padding 0.5s ease; /* Animación suave */
 }
 
+.search-box.active {
+    width: 300px; /* Ancho del buscador cuando está visible */
+    padding: 10px 20px;
+}
+
+/* Estilo del input */
 .search-box input {
-    width: 200px;
+    width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Ajustar el ícono de búsqueda */
+#search-icon {
+    font-size: 30px; /* Igual que los otros botones */
+    cursor: pointer;
+    color: black;
+    transition: color 0.3s ease;
+}
+
+#search-icon:hover {
+    color: #e74c3c;
+}
+
+#user-menu {
+    position: relative;
+    z-index: 1000; /* Asegurar que esté encima de otros elementos */
+}
+
+#user-dropdown {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    list-style: none;
+    padding: 10px;
+    display: none; /* Ocultar por defecto */
+}
+
+#user-dropdown li {
+    margin: 0;
+    padding: 5px 10px;
+}
+
+#user-dropdown li a {
+    text-decoration: none;
+    color: black;
+    font-size: 14px;
+}
+
+#user-dropdown li a:hover {
+    color: red;
+}
+
+#user-dropdown.hidden {
+    display: none; /* Ocultar cuando tenga la clase "hidden" */
+}
+
+#user-dropdown:not(.hidden) {
+    display: block; /* Mostrar cuando no tenga la clase "hidden" */
+}
+
+/* Ajustar el tamaño y la posición del indicador de estado del usuario */
+#user-status {
+    position: absolute;
+    bottom: -5px; /* Ajustar hacia abajo */
+    left: -10px; /* Mover hacia la izquierda */
+    width: 8px; /* Reducir el tamaño */
+    height: 8px; /* Reducir el tamaño */
+    background-color: green; /* Verde para indicar que está logueado */
+    border-radius: 50%;
+    border: 1px solid white; /* Reducir el borde */
+    display: none; /* Ocultar por defecto */
+}
+
+#user-status.logged-in {
+    display: block; /* Mostrar cuando el usuario esté logueado */
 }
 
 /* Media Queries */

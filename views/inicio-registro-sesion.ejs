@@ -11,7 +11,7 @@
     <div class="contenedor">
         <div class="form-box">
             <h2 id="form-title">Iniciar Sesión</h2>
-
+    
             <form id="loginForm">
                 <div class="input-box">
                     <input type="email" id="email" required>
@@ -24,19 +24,34 @@
                 <button type="submit" class="btn">Iniciar Sesión</button>
                 <p class="toggle-text">¿No tienes cuenta? <a href="#" id="toggleForm">Regístrate</a></p>
             </form>
-
+    
             <form id="registerForm" class="hidden">
                 <div class="input-box">
-                    <input type="text" id="nombre" required>
+                    <input type="text" id="nombre" name="nombre" required>
                     <label>Nombre Completo</label>
                 </div>
                 <div class="input-box">
-                    <input type="email" id="email-register" required>
+                    <input type="email" id="email-register" name="correo" required>
                     <label>Correo Electrónico</label>
                 </div>
                 <div class="input-box">
-                    <input type="password" id="password-register" required>
+                    <input type="password" id="password-register" name="contrasena" required>
                     <label>Contraseña</label>
+                </div>
+                <div class="input-box">
+                    <input type="text" id="direccion" name="direccion" required>
+                    <label>Dirección</label>
+                </div>
+                <div class="input-box">
+                    <input type="text" id="telefono" name="telefono" required>
+                    <label>Teléfono</label>
+                </div>
+                <div class="input-box">
+                    <select id="rol_id" name="rol_id" required>
+                        <option value="1">Cliente</option>
+                        <option value="2">Administrador</option>
+                    </select>
+                    <label>Rol</label>
                 </div>
                 <button type="submit" class="btn">Registrarse</button>
                 <p class="toggle-text">¿Ya tienes cuenta? <a href="#" id="toggleFormBack">Inicia Sesión</a></p>

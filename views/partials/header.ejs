@@ -14,18 +14,25 @@
       <li><a href="/productos">Productos</a></li>
       <li><a href="/nosotros">Nosotros</a></li>
       <li><a href="/contacto">Contacto</a></li>
+      <li><a href="/pedidos">Pedidos</a></li>
     </ul>
   </nav>
   <div id="botones">
     <i class='bx bx-menu' id="menu-icon"></i>
     <i class='bx bx-search-alt-2' id="search-icon"></i>
     <div class="container-cart-icon">
-      <i class='bx bx-cart-add icon-cart'></i>
-      <div class="count-products"><span id="contador-productos">0</span></div>
+        <i class='bx bx-cart-add icon-cart'></i>
+        <div class="count-products"><span id="contador-productos">0</span></div>
     </div>
-    <a href="/inicio-registro-sesion">
-      <i class='bx bx-user' id="user-icon"></i>
-    </a>
+    <div id="user-menu">
+      <a href="#" id="user-link">
+          <i class='bx bx-user' id="user-icon"></i>
+          <span id="user-status" class="hidden"></span>
+      </a>
+      <ul id="user-dropdown" class="hidden">
+          <li><a href="#" id="logout-button">Cerrar Sesión</a></li>
+      </ul>
+    </div>
   </div>
 </header>
 
@@ -40,18 +47,14 @@
   <p class="cart-empty">El carrito está vacío</p>
 </div>
 
-<div id="search-box" class="search-box">
+<div id="search-box" class="search-box hidden">
   <form id="search-form" action="/productos" method="GET">
     <input 
       type="text" 
       name="q" 
       id="search-input" 
-      placeholder="Buscar..." 
-      value="<%= typeof q !== 'undefined' ? q : '' %>" 
+      placeholder="Buscar productos o categorías..." 
       required>
-    <button type="submit" id="search-button">
-      <i class='bx bx-search-alt-2'></i>
-    </button>
   </form>
 </div>
 

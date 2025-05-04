@@ -1,6 +1,7 @@
 .swiper {
     width: 100%;
     height: 480px;
+    z-index: 1; /* Asegurar que el carrusel tenga un z-index bajo */
 }
 
 .swiper-slide {

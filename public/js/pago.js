@@ -28,8 +28,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Confirmar la compra
     btnConfirmarPago.addEventListener('click', () => {
-        alert('¡Compra confirmada! Gracias por tu compra.');
-        localStorage.removeItem('carrito'); // Vaciar el carrito
-        window.location.href = '/'; // Redirigir al inicio
+        // Crear el modal
+        const modal = document.createElement('div');
+        modal.classList.add('modal');
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close" onclick="this.parentElement.parentElement.style.display='none'">&times;</span>
+                <h2>Confirmar Compra</h2>
+                <form id="confirmar-compra-form">
+                    <label for="cliente-nombre">Nombre:</label>
+                    <input type="text" id="cliente-nombre" required>
+                    <label for="cliente-direccion">Dirección:</label>
+                    <input type="text" id="cliente-direccion" required>
+                    <button type="submit">Confirmar</button>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.style.display = 'flex';
+
+        // Manejar el envío del formulario
+        document.getElementById('confirmar-compra-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const clienteNombre = document.getElementById('cliente-nombre').value;
+            const clienteDireccion = document.getElementById('cliente-direccion').value;
+
+            try {
+                const response = await fetch('/api/pedidos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cliente_nombre: clienteNombre, cliente_direccion: clienteDireccion, productos: carrito }),
+                });
+
+                if (response.ok) {
+                    alert('¡Compra confirmada!');
+                    localStorage.removeItem('carrito');
+                    window.location.href = '/pedidos';
+                } else {
+                    const error = await response.json();
+                    alert(`Error al confirmar la compra: ${error.error}`);
+                }
+            } catch (error) {
+                console.error('Error al confirmar compra:', error);
+                alert('Ocurrió un error al confirmar la compra.');
+            }
+        });
     });
 });

@@ -12,27 +12,40 @@
   <section class="productos-container">
     <h1>Nuestros Productos</h1>
     <button class="btn-agregar" onclick="abrirFormulario()">Agregar Producto</button>
-    
+
+    <!-- Campo de búsqueda -->
+    <form id="search-form" action="/productos" method="GET" class="search-form">
+        <input 
+            type="text" 
+            name="q" 
+            id="search-input" 
+            placeholder="Buscar productos o categorías..." 
+            required>
+        <button type="submit" class="btn-buscar">Buscar</button>
+    </form>
+
     <div class="productos-grid">
-      <% productos.forEach(producto => { %>
-        <div class="producto-card" 
-             data-id="<%= producto.id %>" 
-             data-nombre="<%= producto.nombre %>" 
-             data-precio="<%= producto.precio %>" 
-             data-descuento="<%= producto.descuento %>" 
-             data-stock="<%= producto.stock %>" 
-             data-categoria="<%= producto.categoria %>" 
-             data-imagen="<%= producto.imagen %>">
-          <img src="<%= producto.imagen %>" alt="<%= producto.nombre %>">
-          <h3><%= producto.nombre %></h3>
-          <p class="precio">Precio: $<%= (producto.precio - (producto.precio * (producto.descuento / 100))).toFixed(2) %></p>
-          <p class="categoria">Categoría: <%= producto.categoria %></p>
-          <button class="btn-add-cart">Agregar al carrito</button>
-          <button class="btn-edit-product" onclick="abrirFormularioEdicion('<%= producto.id %>')">
-            <i class='bx bx-pencil'></i>
-          </button>
-        </div>
-      <% }) %>
+        <% productos.forEach(producto => { %>
+            <div class="producto-card" 
+                 data-id="<%= producto.id %>" 
+                 data-nombre="<%= producto.nombre %>" 
+                 data-precio="<%= producto.precio %>" 
+                 data-descuento="<%= producto.descuento %>" 
+                 data-stock="<%= producto.stock %>" 
+                 data-categoria="<%= producto.categoria %>" 
+                 data-imagen="<%= producto.imagen %>">
+                <img src="<%= producto.imagen %>" alt="<%= producto.nombre %>">
+                <h3><%= producto.nombre %></h3>
+                <p class="precio">Precio: $<%= (producto.precio - (producto.precio * (producto.descuento / 100))).toFixed(2) %></p>
+                <p class="categoria">Categoría: <%= producto.categoria %></p>
+                <button class="btn-add-cart">
+                    <i class='bx bx-cart-add'></i> Agregar al carrito
+                </button>
+                <button class="btn-edit-product" onclick="abrirFormularioEdicion('<%= producto.id %>')">
+                    <i class='bx bx-pencil'></i>
+                </button>
+            </div>
+        <% }) %>
     </div>
   </section>
 
@@ -56,11 +69,18 @@
 
       <label for="categoria">Categoría:</label>
       <select id="categoria" required>
-        <!-- Las opciones se llenarán dinámicamente desde la base de datos -->
+        <!-- Opciones dinámicas -->
       </select>
 
       <label for="imagen">Imagen (URL):</label>
       <input type="text" id="imagen" placeholder="Ej: https://example.com/imagen.jpg" required>
+
+      <label for="metodo_calculo">Método de Cálculo:</label>
+      <select id="metodo_calculo" name="metodo_calculo" required>
+          <option value="cantidad" selected>Cantidad</option>
+          <option value="libras">Libras</option>
+          <option value="litros">Litros</option>
+      </select>
 
       <button type="submit" class="btn-guardar">Guardar</button>
     </form>
@@ -87,11 +107,18 @@
 
       <label for="editar-categoria">Categoría:</label>
       <select id="editar-categoria" required>
-        <!-- Las opciones se llenarán dinámicamente desde la base de datos -->
+        <!-- Opciones dinámicas -->
       </select>
 
       <label for="editar-imagen">Imagen (URL):</label>
       <input type="text" id="editar-imagen" placeholder="Ej: https://example.com/imagen.jpg" required>
+
+      <label for="metodo_calculo">Método de Cálculo:</label>
+      <select id="metodo_calculo" name="metodo_calculo" required>
+          <option value="cantidad" selected>Cantidad</option>
+          <option value="libras">Libras</option>
+          <option value="litros">Litros</option>
+      </select>
 
       <button type="submit" class="btn-guardar">Guardar Cambios</button>
       <button type="button" class="btn-eliminar" onclick="eliminarProducto()">Eliminar Producto</button>
