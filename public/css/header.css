@@ -32,10 +32,12 @@ header::after {
     height: 50px;
 }
 
+/* Ajustar el contenedor de los botones */
 #botones {
     display: flex;
     align-items: center; /* Alinear verticalmente los íconos */
     gap: 15px; /* Espaciado entre los íconos */
+    margin-left: auto; /* Empujar los botones hacia la derecha */
 }
 
 .bx {
@@ -49,8 +51,9 @@ header::after {
     color: rgb(172, 1, 1); /* Cambiar el color al pasar el mouse */
 }
 
+/* Asegurar que el botón del menú esté visible en dispositivos móviles */
 #menu-icon {
-    display: none;
+    display: block;
     font-size: 30px;
     cursor: pointer;
 }
@@ -81,13 +84,17 @@ header nav {
     margin: 0;
     display: flex;
     align-items: center;
+    flex: 1;
 }
 
 header nav ul {
+    display: flex;
+    justify-content: center; /* Centrar los elementos horizontalmente */
+    align-items: center; /* Alinear verticalmente */
+    flex: 1; /* Permitir que el menú ocupe el espacio disponible */
     list-style-type: none;
     padding: 0;
-    margin: 0;
-    display: flex;
+    margin: 0 auto;
 }
 
 header nav ul li {
@@ -118,20 +125,23 @@ header nav ul li a:hover {
     text-decoration: none;
 }
 
+/* Ocultar el menú en dispositivos móviles */
 #nav-links {
-    display: flex;
-}
-
-.nav-active {
-    display: block;
+    display: none;
+    flex-direction: column;
     position: absolute;
     top: 60px;
     right: 20px;
     background-color: white;
+    width: 200px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-    padding: 10px;
     z-index: 1000;
+}
+
+/* Mostrar el menú cuando se active */
+#nav-links.nav-active {
+    display: flex;
 }
 
 .nav-active ul {
@@ -146,6 +156,11 @@ header nav ul li a:hover {
 
 .nav-active ul li:not(:last-child)::after {
     content: none;
+}
+
+/* Mostrar el botón del menú en dispositivos móviles */
+#menu-icon {
+    display: block;
 }
 
 /* Contenedor del buscador */
@@ -246,18 +261,17 @@ header nav ul li a:hover {
     display: block; /* Mostrar cuando el usuario esté logueado */
 }
 
-/* Media Queries */
-@media (max-width: 768px) {
+/* Ocultar el botón del menú en pantallas grandes */
+@media (min-width: 768px) {
     #menu-icon {
-        display: block;
-    }
-
-    header nav {
         display: none;
     }
 
-    .nav-active {
+    #nav-links {
         display: flex;
+        position: static;
+        flex-direction: row;
+        box-shadow: none;
     }
 }
 

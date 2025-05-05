@@ -24,6 +24,21 @@
     flex: 1;
 }
 
+/* Botones en columna */
+.pedido-actions {
+    display: flex;
+    flex-direction: column; /* Alinear los botones en columna */
+    gap: 10px; /* Espaciado entre botones */
+    align-items: flex-end; /* Alinear a la derecha */
+}
+
+/* Botones "Válido" y "No Válido" en fila */
+.validacion-actions {
+    display: flex;
+    gap: 10px; /* Espaciado entre botones */
+    justify-content: flex-end; /* Alinear a la derecha */
+}
+
 .pedido-actions {
     display: flex;
     gap: 10px;
@@ -34,6 +49,12 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+/* Botón de "Ver Productos" */
+.btn-ver-productos {
+    background-color: #007bff;
+    color: white;
 }
 
 button.btn-ver-productos {
@@ -48,6 +69,12 @@ button.btn-estado {
 
 button.btn-cancelar {
     background-color: #dc3545;
+    color: white;
+}
+
+/* Botón de "Desvalidar" */
+.btn-desvalidar {
+    background-color: #ffc107;
     color: white;
 }
 

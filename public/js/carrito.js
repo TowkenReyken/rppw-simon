@@ -40,11 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="cantidad-producto-carrito">${product.quantity}x</span>
                     <p class="titulo-producto-carrito">${product.title}</p>
                     <span class="precio-producto-carrito">$${(finalPrice * product.quantity).toFixed(2)}</span>
-                    <div class="cantidad-controls">
-                        <button class="btn-decrement" data-id="${product.id}">-</button>
-                        <span class="cantidad">${product.quantity}</span>
-                        <button class="btn-increment" data-id="${product.id}">+</button>
-                    </div>
                 </div>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-close" data-id="${product.id}">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -73,33 +68,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const existingProduct = allProducts.find(product => product.id === id);
             if (existingProduct) {
-                existingProduct.quantity += 1;
+                existingProduct.quantity += 1; // Incrementar cantidad si ya existe
             } else {
-                allProducts.push({ id, title, price, discount, quantity: 1 });
+                allProducts.push({ id, title, price, discount, quantity: 1 }); // Agregar nuevo producto
             }
 
             updateCart();
         });
     });
 
-    // Manejar incremento y decremento de cantidades en el carrito
-    rowProduct.addEventListener('click', (e) => {
-        const id = e.target.dataset.id;
-        const product = allProducts.find(product => product.id === id);
-        if (!product) return;
-
-        if (e.target.classList.contains('btn-increment')) {
-            product.quantity += 1;
-        } else if (e.target.classList.contains('btn-decrement')) {
-            product.quantity -= 1;
-            if (product.quantity <= 0) {
-                allProducts = allProducts.filter(p => p.id !== id);
-            }
-        }
-        updateCart();
-    });
-
-    // Eliminar producto del carrito
+    // Manejar eliminación de productos del carrito
     rowProduct.addEventListener('click', (e) => {
         if (e.target.classList.contains('icon-close')) {
             const id = e.target.dataset.id;

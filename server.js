@@ -8,6 +8,8 @@ const { Pool } = require('pg'); // Importar Pool para PostgreSQL
 const bcrypt = require('bcrypt'); // Para encriptar contraseñas
 const jwt = require('jsonwebtoken'); // Para manejar tokens de sesión
 const cookieParser = require('cookie-parser'); // Importar cookie-parser
+const multer = require('multer'); // Importar multer para manejo de archivos
+const fs = require('fs'); // Importar fs para manejo de archivos
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +23,15 @@ const pool = new Pool({
   port: process.env.db_port,
 });
 
+// Configuración de multer
+const upload = multer({ dest: 'uploads/' }); // Carpeta donde se guardarán los archivos
+
+// Crear carpeta de uploads si no existe
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir);
+}
+
 // Configuración de middlewares
 app.use(cors());
 app.use(bodyParser.json());
@@ -29,6 +40,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 // Ruta principal
 app.get('/', (req, res) => {
@@ -176,24 +189,6 @@ function authenticateToken(req, res, next) {
     next();
   });
 }
- 
-// Ruta para la página de productos
-app.get('/productos', authenticateToken, async (req, res) => {
-  try {
-    const query = `
-      SELECT p.id, p.nombre, p.precio, p.descuento, p.stock, p.imagen, c.nombre AS categoria
-      FROM productos p
-      INNER JOIN categoria c ON p.categoria_id = c.id
-    `;
-    const result = await pool.query(query);
-    const productos = result.rows;
-
-    res.render('productos', { productos, user: req.user || null });
-  } catch (error) {
-    console.error('Error al obtener productos:', error);
-    res.status(500).send('Error interno del servidor');
-  }
-});
 
 // Ruta protegida para agregar productos
 app.post('/api/productos', authenticateToken, async (req, res) => {
@@ -277,22 +272,28 @@ app.get('/api/pedidos', async (req, res) => {
 
 // Ruta para agregar un nuevo pedido
 app.post('/api/pedidos', async (req, res) => {
-    const { cliente_nombre, cliente_direccion, productos } = req.body;
+    const { cliente_nombre, cliente_direccion, metodo_pago, productos } = req.body;
 
-    if (!cliente_nombre || !cliente_direccion || !productos || productos.length === 0) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios y el carrito no puede estar vacío.' });
+    if (!cliente_nombre || !cliente_direccion || !metodo_pago || !productos || productos.length === 0) {
+        return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
     }
 
     try {
         const query = `
-            INSERT INTO pedidos (cliente_nombre, cliente_direccion, productos, estado)
-            VALUES ($1, $2, $3, 'En progreso') RETURNING *
+            INSERT INTO pedidos (cliente_nombre, cliente_direccion, metodo_pago, productos)
+            VALUES ($1, $2, $3, $4)
         `;
-        const result = await pool.query(query, [cliente_nombre, cliente_direccion, JSON.stringify(productos)]);
-        res.status(201).json(result.rows[0]);
+        const values = [
+            cliente_nombre,
+            cliente_direccion,
+            metodo_pago,
+            JSON.stringify(productos),
+        ];
+        await pool.query(query, values);
+        res.status(201).json({ message: 'Pedido creado exitosamente.' });
     } catch (error) {
-        console.error('Error al agregar pedido:', error);
-        res.status(500).json({ error: 'Error al agregar pedido' });
+        console.error('Error al crear pedido:', error);
+        res.status(500).json({ error: 'Error al crear pedido.' });
     }
 });
 
@@ -329,6 +330,21 @@ app.put('/api/pedidos/:id', async (req, res) => {
     }
 });
 
+// Ruta para validar o desvalidar un pedido
+app.put('/api/pedidos/:id/validar', async (req, res) => {
+    const { id } = req.params;
+    const { validacion } = req.body;
+
+    try {
+        const query = `UPDATE pedidos SET validacion = $1 WHERE id = $2`;
+        await pool.query(query, [validacion, id]);
+        res.status(200).json({ message: 'Validación actualizada correctamente.' });
+    } catch (error) {
+        console.error('Error al actualizar validación del pedido:', error);
+        res.status(500).json({ error: 'Error al actualizar validación del pedido.' });
+    }
+});
+
 // Ruta para eliminar un pedido
 app.delete('/api/pedidos/:id', async (req, res) => {
     const { id } = req.params;
@@ -345,6 +361,36 @@ app.delete('/api/pedidos/:id', async (req, res) => {
 // Ruta para la página de pedidos
 app.get('/pedidos', (req, res) => {
     res.render('pedidos');
+});
+
+// Ruta para subir comprobante
+app.post('/api/subir-comprobante', upload.single('archivo'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No se subió ningún archivo.' });
+    }
+
+    const filePath = path.join(__dirname, 'uploads', req.file.filename);
+
+    // Validar si el archivo es válido (opcional)
+    if (!['.jpg', '.jpeg', '.png', '.pdf'].includes(path.extname(req.file.originalname).toLowerCase())) {
+        fs.unlink(filePath, (err) => {
+            if (err) console.error('Error al eliminar archivo:', err);
+        });
+        return res.status(400).json({ error: 'Formato de archivo no permitido.' });
+    }
+
+    // Programar eliminación automática después de 5 días
+    setTimeout(() => {
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                console.error(`Error al eliminar el archivo ${filePath}:`, err);
+            } else {
+                console.log(`Archivo eliminado: ${filePath}`);
+            }
+        });
+    }, 5 * 24 * 60 * 60 * 1000); // 5 días en milisegundos
+
+    res.json({ filePath: `/uploads/${req.file.filename}` });
 });
 
 // Iniciar el servidor

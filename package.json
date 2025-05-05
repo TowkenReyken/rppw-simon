@@ -1,22 +1,33 @@
 {
   "name": "ppw-simon",
   "version": "1.0.0",
+  "description": "Página web del Supermercado Simón: catálogo de productos y pedidos para delivery.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start:php": "php -S 0.0.0.0:3001 -t src/",
+    "start:node": "node server.js",
+    "start": "concurrently \"npm run start:php\" \"npm run start:node\"",
+    "dev": "concurrently \"npm run start:php\" \"nodemon server.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TowkenReyken/rppw-simon.git"
   },
-  "keywords": [],
+  "keywords": [
+    "supermercado",
+    "delivery",
+    "ecommerce",
+    "nodejs",
+    "php",
+    "supabase"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/TowkenReyken/rppw-simon/issues"
   },
   "homepage": "https://github.com/TowkenReyken/rppw-simon#readme",
-  "description": "",
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",
     "bcrypt": "^5.1.1",
@@ -27,12 +38,14 @@
     "express": "^4.21.2",
     "http-proxy-middleware": "^3.0.5",
     "mssql": "^11.0.1",
+    "multer": "^1.4.5-lts.2",
     "node-fetch": "^3.3.2",
     "pg": "^8.14.1",
-    "php": "^1.1.0",
     "react": "^19.1.0"
   },
   "devDependencies": {
+    "concurrently": "^9.1.2",
     "nodemon": "^3.1.9"
   }
 }
+

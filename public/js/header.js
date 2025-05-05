@@ -76,4 +76,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.location.pathname === "/productos") {
         searchIcon.style.display = "none";
     }
+
+    const menuIcon = document.getElementById("menu-icon");
+    const navLinks = document.getElementById("nav-links");
+
+    // Alternar la clase para mostrar/ocultar el menú
+    menuIcon.addEventListener("click", () => {
+        navLinks.classList.toggle("nav-active");
+    });
+
+    // Cerrar el menú si se hace clic fuera de él
+    document.addEventListener("click", (e) => {
+        if (!navLinks.contains(e.target) && e.target !== menuIcon) {
+            navLinks.classList.remove("nav-active");
+        }
+    });
 });

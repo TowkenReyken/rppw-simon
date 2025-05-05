@@ -38,8 +38,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 <form id="confirmar-compra-form">
                     <label for="cliente-nombre">Nombre:</label>
                     <input type="text" id="cliente-nombre" required>
+                    
                     <label for="cliente-direccion">Dirección:</label>
                     <input type="text" id="cliente-direccion" required>
+                    
+                    <label for="metodo-pago">Método de Pago:</label>
+                    <select id="metodo-pago" required>
+                        <option value="Fisico">Físico</option>
+                        <option value="Transferencia">Transferencia</option>
+                    </select>
+                    
                     <button type="submit">Confirmar</button>
                 </form>
             </div>
@@ -52,26 +60,44 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const clienteNombre = document.getElementById('cliente-nombre').value;
             const clienteDireccion = document.getElementById('cliente-direccion').value;
+            const metodoPago = document.getElementById('metodo-pago').value;
 
-            try {
-                const response = await fetch('/api/pedidos', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ cliente_nombre: clienteNombre, cliente_direccion: clienteDireccion, productos: carrito }),
-                });
-
-                if (response.ok) {
-                    alert('¡Compra confirmada!');
-                    localStorage.removeItem('carrito');
-                    window.location.href = '/pedidos';
-                } else {
-                    const error = await response.json();
-                    alert(`Error al confirmar la compra: ${error.error}`);
-                }
-            } catch (error) {
-                console.error('Error al confirmar compra:', error);
-                alert('Ocurrió un error al confirmar la compra.');
-            }
+            confirmarCompra(clienteNombre, clienteDireccion, metodoPago);
         });
     });
 });
+
+async function confirmarCompra(clienteNombre, clienteDireccion, metodoPago) {
+    const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+    console.log('Datos enviados:', {
+        cliente_nombre: clienteNombre,
+        cliente_direccion: clienteDireccion,
+        metodo_pago: metodoPago,
+        productos: carrito,
+    });
+
+    try {
+        const response = await fetch('/api/pedidos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                cliente_nombre: clienteNombre,
+                cliente_direccion: clienteDireccion,
+                metodo_pago: metodoPago,
+                productos: carrito,
+            }),
+        });
+
+        if (response.ok) {
+            alert('¡Compra confirmada!');
+            localStorage.removeItem('carrito');
+            window.location.href = '/pedidos';
+        } else {
+            const error = await response.json();
+            alert(`Error al confirmar la compra: ${error.error}`);
+        }
+    } catch (error) {
+        console.error('Error al confirmar compra:', error);
+        alert('Ocurrió un error al confirmar la compra.');
+    }
+}
