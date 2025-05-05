@@ -49,7 +49,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="pedido-actions">
                         <button class="btn-ver-productos" data-productos='${JSON.stringify(pedido.productos)}'>Ver Productos</button>
                         ${pedido.validacion === true ? `<button class="btn-estado" data-id="${pedido.id}" data-estado="${pedido.estado}">${pedido.estado === 'En progreso' ? 'Completar Pedido' : 'Completado'}</button>` : ''}
-                        <button class="btn-cancelar" data-id="${pedido.id}">Cancelar Pedido</button>
                         ${validacionButtons}
                     </div>
                 `;
