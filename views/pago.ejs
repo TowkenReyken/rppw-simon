@@ -18,6 +18,7 @@
             <th>Producto</th>
             <th>Cantidad</th>
             <th>Precio</th>
+            <th>Descuento</th>
             <th>Total</th>
           </tr>
         </thead>
@@ -30,6 +31,34 @@
       <h2>Total a Pagar: <span id="total-pago">$0</span></h2>
       <button id="btn-confirmar-pago">Confirmar Compra</button>
     </div>
+
+    <!-- Modal para confirmar compra (actualizado) -->
+<div id="modal-confirmar" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Confirmar Compra</h2>
+    <form id="confirmar-compra-form" enctype="multipart/form-data">
+      <label for="cliente-nombre">Nombre:</label>
+      <input type="text" id="cliente-nombre" required>
+      
+      <label for="cliente-direccion">Dirección:</label>
+      <input type="text" id="cliente-direccion" required>
+      
+      <label for="metodo-pago">Método de Pago:</label>
+      <select id="metodo-pago" required>
+        <option value="Fisico">Físico</option>
+        <option value="Transferencia">Transferencia</option>
+      </select>
+      
+      <div id="comprobante-container" style="display: none;">
+        <label for="comprobante">Comprobante de Transferencia:</label>
+        <input type="file" id="comprobante" accept=".jpg,.jpeg,.png,.pdf">
+      </div>
+      
+      <button type="submit">Confirmar</button>
+    </form>
+  </div>
+</div>
   </section>
 
   <%- include('partials/footer') %>

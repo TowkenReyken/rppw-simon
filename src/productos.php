@@ -92,17 +92,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("
             INSERT INTO productos (nombre, precio, descuento, stock, categoria_id, imagen)
             VALUES (:nombre, :precio, :descuento, :stock, :categoria_id, :imagen)
+            RETURNING id, nombre, precio, descuento, stock, imagen, (SELECT nombre FROM categoria WHERE id = :categoria_id) AS categoria
         ");
         $stmt->execute([
             ':nombre' => $input['nombre'],
-            ':precio' => $input['precio'],
-            ':descuento' => $input['descuento'] ?? 0,
-            ':stock' => $input['stock'],
-            ':categoria_id' => $input['categoria_id'],
+            ':precio' => (float)$input['precio'],
+            ':descuento' => (int)($input['descuento'] ?? 0),
+            ':stock' => (int)$input['stock'],
+            ':categoria_id' => (int)$input['categoria_id'],
             ':imagen' => $input['imagen']
         ]);
+        
+        $producto = $stmt->fetch(PDO::FETCH_ASSOC);
         http_response_code(201);
-        echo json_encode(["message" => "Producto agregado exitosamente"]);
+        echo json_encode($producto);
     } catch (PDOException $e) {
         error_log("Error al insertar producto: " . $e->getMessage());
         http_response_code(500);
@@ -126,18 +129,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
             UPDATE productos
             SET nombre = :nombre, precio = :precio, descuento = :descuento, stock = :stock, categoria_id = :categoria_id, imagen = :imagen
             WHERE id = :id
+            RETURNING id, nombre, precio, descuento, stock, imagen, (SELECT nombre FROM categoria WHERE id = :categoria_id) AS categoria
         ");
         $stmt->execute([
-            ':id' => $input['id'],
+            ':id' => (int)$input['id'],
             ':nombre' => $input['nombre'],
-            ':precio' => $input['precio'],
-            ':descuento' => $input['descuento'] ?? 0,
-            ':stock' => $input['stock'],
-            ':categoria_id' => $input['categoria_id'],
+            ':precio' => (float)$input['precio'],
+            ':descuento' => (int)($input['descuento'] ?? 0),
+            ':stock' => (int)$input['stock'],
+            ':categoria_id' => (int)$input['categoria_id'],
             ':imagen' => $input['imagen']
         ]);
+        
+        $producto = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$producto) {
+            http_response_code(404);
+            echo json_encode(["error" => "Producto no encontrado"]);
+            exit;
+        }
+        
         http_response_code(200);
-        echo json_encode(["message" => "Producto actualizado exitosamente"]);
+        echo json_encode($producto);
     } catch (PDOException $e) {
         http_response_code(500);
         echo json_encode(['error' => 'Error al actualizar producto: ' . $e->getMessage()]);

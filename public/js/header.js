@@ -4,6 +4,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const logoutButton = document.getElementById("logout-button");
     const userStatus = document.getElementById("user-status");
 
+    const userId = localStorage.getItem("userId");
+if (userId) {
+  // mostrar el nombre del usuario en la barra de navegación
+  userStatus.textContent = `Bienvenido, ${userId}`;
+}
+
     // Verificar si el usuario está logueado
     const token = localStorage.getItem("token");
     if (token) {
@@ -50,6 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         localStorage.removeItem("token"); // Eliminar el token
         window.location.href = "/"; // Redirigir al menú principal
+        localStorage.removeItem("userId"); // Eliminar el userId
     });
 
     const searchIcon = document.getElementById("search-icon");

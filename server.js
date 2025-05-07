@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken'); // Para manejar tokens de sesión
 const cookieParser = require('cookie-parser'); // Importar cookie-parser
 const multer = require('multer'); // Importar multer para manejo de archivos
 const fs = require('fs'); // Importar fs para manejo de archivos
+const nodemailer = require('nodemailer'); // Importar nodemailer para envío de correos
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,7 +25,21 @@ const pool = new Pool({
 });
 
 // Configuración de multer
-const upload = multer({ dest: 'uploads/' }); // Carpeta donde se guardarán los archivos
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+      // Guardar con nombre único pero manteniendo la extensión
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 } // Límite de 5MB
+});
 
 // Crear carpeta de uploads si no existe
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -37,6 +52,21 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, path) => {
+      // Configurar headers para visualización en el navegador
+      if (path.endsWith('.pdf')) {
+          res.set('Content-Type', 'application/pdf');
+          res.set('Content-Disposition', 'inline; filename="comprobante.pdf"');
+      } else if (path.endsWith('.jpg') || path.endsWith('.jpeg')) {
+          res.set('Content-Type', 'image/jpeg');
+          res.set('Content-Disposition', 'inline; filename="comprobante.jpg"');
+      } else if (path.endsWith('.png')) {
+          res.set('Content-Type', 'image/png');
+          res.set('Content-Disposition', 'inline; filename="comprobante.png"');
+      }
+  }
+}));
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -117,17 +147,28 @@ app.get('/pago', (req, res) => {
 app.post('/api/register', async (req, res) => {
   const { nombre, correo, contrasena, direccion, telefono, rol_id } = req.body;
 
-  if (!nombre || !correo || !contrasena || !direccion || !telefono || !rol_id) {
+  // Quita rol_id de la validación obligatoria
+  if (!nombre || !correo || !contrasena || !direccion || !telefono) {
     return res.status(400).json({ error: 'Todos los campos son obligatorios' });
   }
 
   try {
     const hashedPassword = await bcrypt.hash(contrasena, 10); // Encriptar contraseña
-    const query = `
-      INSERT INTO usuarios (nombre, correo, contrasena, direccion, telefono, rol_id, fecha_registro)
-      VALUES ($1, $2, $3, $4, $5, $6, NOW())
-    `;
-    await pool.query(query, [nombre, correo, hashedPassword, direccion, telefono, rol_id]);
+    let query, values;
+    if (rol_id) {
+      query = `
+        INSERT INTO usuarios (nombre, correo, contrasena, direccion, telefono, rol_id, fecha_registro)
+        VALUES ($1, $2, $3, $4, $5, $6, NOW())
+      `;
+      values = [nombre, correo, hashedPassword, direccion, telefono, rol_id];
+    } else {
+      query = `
+        INSERT INTO usuarios (nombre, correo, contrasena, direccion, telefono, fecha_registro)
+        VALUES ($1, $2, $3, $4, $5, NOW())
+      `;
+      values = [nombre, correo, hashedPassword, direccion, telefono];
+    }
+    await pool.query(query, values);
     res.status(201).json({ message: 'Usuario registrado exitosamente' });
   } catch (error) {
     console.error('Error al registrar usuario:', error);
@@ -140,25 +181,28 @@ app.post('/api/login', async (req, res) => {
   const { correo, contrasena } = req.body;
 
   if (!correo || !contrasena) {
+    console.log('Faltan datos');
     return res.status(400).json({ error: 'Correo y contraseña son obligatorios' });
   }
 
   try {
     const query = `SELECT * FROM usuarios WHERE correo = $1`;
     const result = await pool.query(query, [correo]);
+    console.log('Resultado de la consulta:', result.rows);
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
+      console.log('Usuario no encontrado');
+      return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
     }
 
     const usuario = result.rows[0];
     const isPasswordValid = await bcrypt.compare(contrasena, usuario.contrasena);
 
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Contraseña incorrecta' });
+      console.log('Contraseña incorrecta');
+      return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
     }
 
-    // Generar un token JWT con el nombre del usuario
     const token = jwt.sign(
       { id: usuario.id, rol_id: usuario.rol_id, nombre: usuario.nombre },
       process.env.JWT_SECRET,
@@ -192,47 +236,55 @@ function authenticateToken(req, res, next) {
 
 // Ruta protegida para agregar productos
 app.post('/api/productos', authenticateToken, async (req, res) => {
-    const { nombre, precio, descuento, stock, categoria_id, imagen, metodo_calculo } = req.body;
+  const { nombre, precio, descuento, stock, categoria_id, imagen } = req.body;
 
-    if (!nombre || !precio || !categoria_id || !imagen || !stock || !metodo_calculo) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios' });
-    }
+  if (!nombre || !precio || !categoria_id || !imagen || !stock) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+  }
 
-    try {
-        const query = `
-            INSERT INTO productos (nombre, precio, descuento, stock, categoria_id, imagen, metodo_calculo)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
-        `;
-        const values = [nombre, precio, descuento, stock, categoria_id, imagen, metodo_calculo];
-        await pool.query(query, values);
-    } catch (error) {
-        console.error('Error al agregar producto:', error);
-        res.status(500).json({ error: 'Error al agregar producto' });
-    }
+  try {
+      const query = `
+          INSERT INTO productos (nombre, precio, descuento, stock, categoria_id, imagen)
+          VALUES ($1, $2, $3, $4, $5, $6)
+          RETURNING *
+      `;
+      const values = [nombre, parseFloat(precio), parseInt(descuento) || 0, parseInt(stock), categoria_id, imagen];
+      const result = await pool.query(query, values);
+      res.status(201).json(result.rows[0]);
+  } catch (error) {
+      console.error('Error al agregar producto:', error);
+      res.status(500).json({ error: 'Error al agregar producto' });
+  }
 });
 
 // Ruta protegida para editar productos
 app.put('/api/productos/:id', authenticateToken, async (req, res) => {
-    const { id } = req.params;
-    const { nombre, precio, descuento, stock, categoria_id, imagen, metodo_calculo } = req.body;
+  const { id } = req.params;
+  const { nombre, precio, descuento, stock, categoria_id, imagen } = req.body;
 
-    if (!nombre || !precio || !categoria_id || !imagen || !stock || !metodo_calculo) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios' });
-    }
+  if (!nombre || !precio || !categoria_id || !imagen || !stock) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+  }
 
-    try {
-        const query = `
-            UPDATE productos
-            SET nombre = $1, precio = $2, descuento = $3, stock = $4, categoria_id = $5, imagen = $6, metodo_calculo = $7
-            WHERE id = $8
-        `;
-        const values = [nombre, precio, descuento, stock, categoria_id, imagen, metodo_calculo, id];
-        await pool.query(query, values);
-        res.status(200).json({ message: 'Producto actualizado exitosamente' });
-    } catch (error) {
-        console.error('Error al actualizar producto:', error);
-        res.status(500).json({ error: 'Error al actualizar producto' });
-    }
+  try {
+      const query = `
+          UPDATE productos
+          SET nombre = $1, precio = $2, descuento = $3, stock = $4, categoria_id = $5, imagen = $6
+          WHERE id = $7
+          RETURNING *
+      `;
+      const values = [nombre, parseFloat(precio), parseInt(descuento) || 0, parseInt(stock), categoria_id, imagen, id];
+      const result = await pool.query(query, values);
+      
+      if (result.rowCount === 0) {
+          return res.status(404).json({ error: 'Producto no encontrado' });
+      }
+      
+      res.status(200).json(result.rows[0]);
+  } catch (error) {
+      console.error('Error al actualizar producto:', error);
+      res.status(500).json({ error: 'Error al actualizar producto' });
+  }
 });
 
 // Ruta protegida para eliminar productos
@@ -251,50 +303,52 @@ app.delete('/api/productos/:id', authenticateToken, async (req, res) => {
 
 // Ruta para obtener todos los pedidos
 app.get('/api/pedidos', async (req, res) => {
-    try {
-        const query = `
-            SELECT * FROM pedidos
-            ORDER BY 
-                CASE 
-                    WHEN estado = 'Pendiente' THEN 1
-                    WHEN estado = 'En progreso' THEN 2
-                    WHEN estado = 'Completado' THEN 3
-                END,
-                fecha ASC
-        `;
-        const result = await pool.query(query);
-        res.json(result.rows);
-    } catch (error) {
-        console.error('Error al obtener pedidos:', error);
-        res.status(500).json({ error: 'Error al obtener pedidos' });
-    }
+  try {
+      const query = `
+          SELECT *, comprobante_path FROM pedidos
+          ORDER BY 
+              CASE 
+                  WHEN estado = 'Pendiente' THEN 1
+                  WHEN estado = 'En progreso' THEN 2
+                  WHEN estado = 'Completado' THEN 3
+              END,
+              fecha ASC
+      `;
+      const result = await pool.query(query);
+      res.json(result.rows);
+  } catch (error) {
+      console.error('Error al obtener pedidos:', error);
+      res.status(500).json({ error: 'Error al obtener pedidos' });
+  }
 });
+
 
 // Ruta para agregar un nuevo pedido
 app.post('/api/pedidos', async (req, res) => {
-    const { cliente_nombre, cliente_direccion, metodo_pago, productos } = req.body;
+  const { cliente_nombre, cliente_direccion, metodo_pago, productos, comprobante_path } = req.body;
 
-    if (!cliente_nombre || !cliente_direccion || !metodo_pago || !productos || productos.length === 0) {
+  if (!cliente_nombre || !cliente_direccion || !metodo_pago || !productos || productos.length === 0) {
         return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
     }
 
-    try {
-        const query = `
-            INSERT INTO pedidos (cliente_nombre, cliente_direccion, metodo_pago, productos)
-            VALUES ($1, $2, $3, $4)
-        `;
-        const values = [
-            cliente_nombre,
-            cliente_direccion,
-            metodo_pago,
-            JSON.stringify(productos),
-        ];
-        await pool.query(query, values);
-        res.status(201).json({ message: 'Pedido creado exitosamente.' });
-    } catch (error) {
-        console.error('Error al crear pedido:', error);
-        res.status(500).json({ error: 'Error al crear pedido.' });
-    }
+  try {
+      const query = `
+          INSERT INTO pedidos (cliente_nombre, cliente_direccion, metodo_pago, productos, comprobante_path)
+          VALUES ($1, $2, $3, $4, $5)
+      `;
+      const values = [
+          cliente_nombre,
+          cliente_direccion,
+          metodo_pago,
+          JSON.stringify(productos),
+          comprobante_path // Añadir esta línea
+      ];
+      await pool.query(query, values);
+      res.status(201).json({ message: 'Pedido creado exitosamente.' });
+  } catch (error) {
+      console.error('Error al crear pedido:', error);
+      res.status(500).json({ error: 'Error al crear pedido.' });
+  }
 });
 
 // Ruta para actualizar el estado de un pedido
@@ -333,15 +387,83 @@ app.put('/api/pedidos/:id', async (req, res) => {
 // Ruta para validar o desvalidar un pedido
 app.put('/api/pedidos/:id/validar', async (req, res) => {
     const { id } = req.params;
-    const { validacion } = req.body;
+    let { validacion, motivo } = req.body;
+
+    // Forzar el valor booleano o null
+    if (validacion === "false" || validacion === false) {
+        validacion = false;
+    } else if (validacion === "true" || validacion === true) {
+        validacion = true;
+    } else {
+        validacion = null;
+    }
 
     try {
-        const query = `UPDATE pedidos SET validacion = $1 WHERE id = $2`;
-        await pool.query(query, [validacion, id]);
-        res.status(200).json({ message: 'Validación actualizada correctamente.' });
+        // Actualizar el campo de validación
+        await pool.query(
+            'UPDATE pedidos SET validacion = $1 WHERE id = $2',
+            [validacion, id]
+        );
+
+        // Si se marca como "No válido", eliminar comprobante y enviar email
+        if (validacion === false || validacion === "false") {
+            // Obtener comprobante_path y correo del cliente
+            const result = await pool.query(
+                'SELECT comprobante_path, cliente_nombre, cliente_direccion, metodo_pago, cliente_correo FROM pedidos WHERE id = $1',
+                [id]
+            );
+            const pedido = result.rows[0];
+            const comprobantePath = pedido?.comprobante_path;
+            const correoCliente = pedido?.cliente_correo;
+
+            // Eliminar comprobante si existe (como ya tienes)
+            if (comprobantePath) {
+                const fileName = path.basename(comprobantePath);
+                const filePath = path.join(__dirname, 'uploads', fileName);
+                fs.unlink(filePath, (err) => {
+                    if (err) console.error('Error al eliminar comprobante:', err);
+                });
+                await pool.query(
+                    'UPDATE pedidos SET comprobante_path = NULL WHERE id = $1',
+                    [id]
+                );
+            }
+
+            // Enviar email al cliente
+            if (correoCliente) {
+                // Configura tu transportador de nodemailer
+                const transporter = nodemailer.createTransport({
+                    service: 'gmail', // O el servicio que uses
+                    auth: {
+                        user: process.env.EMAIL_USER, // Pon tu correo en .env
+                        pass: process.env.EMAIL_PASS  // Pon tu contraseña en .env
+                    },
+                    tls: {
+                        rejectUnauthorized: false // <-- Agrega esta línea
+                    }
+                });
+
+                const mailOptions = {
+                    from: process.env.EMAIL_USER,
+                    to: correoCliente,
+                    subject: 'Pedido No Validado - Supermercado Simón',
+                    text: `Hola, tu pedido no pudo ser validado por el siguiente motivo:\n\n${motivo}\n\nSi tienes dudas, contáctanos.`
+                };
+
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        console.error('Error al enviar email:', error);
+                    } else {
+                        console.log('Email enviado:', info.response);
+                    }
+                });
+            }
+        }
+
+        res.status(200).json({ message: 'Validación actualizada correctamente' });
     } catch (error) {
-        console.error('Error al actualizar validación del pedido:', error);
-        res.status(500).json({ error: 'Error al actualizar validación del pedido.' });
+        console.error('Error al validar pedido:', error);
+        res.status(500).json({ error: 'Error al validar pedido' });
     }
 });
 
@@ -391,6 +513,41 @@ app.post('/api/subir-comprobante', upload.single('archivo'), (req, res) => {
     }, 5 * 24 * 60 * 60 * 1000); // 5 días en milisegundos
 
     res.json({ filePath: `/uploads/${req.file.filename}` });
+});
+
+// Ruta para enviar mensaje de contacto
+app.post('/api/contacto', async (req, res) => {
+    const { nombre, email, asunto, mensaje } = req.body;
+
+    if (!nombre || !email || !asunto || !mensaje) {
+        return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+    }
+
+    try {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            },
+            tls: {
+                rejectUnauthorized: false // <-- Agrega esta línea
+            }
+        });
+
+        const mailOptions = {
+            from: `"${nombre}" <${email}>`,
+            to: 'reynosochris70@gmail.com',
+            subject: `[Contacto Web] ${asunto}`,
+            text: `Nombre: ${nombre}\nCorreo: ${email}\n\nMensaje:\n${mensaje}`
+        };
+
+        await transporter.sendMail(mailOptions);
+        res.json({ message: 'Mensaje enviado correctamente' });
+    } catch (error) {
+        console.error('Error al enviar el correo de contacto:', error);
+        res.status(500).json({ error: 'Error al enviar el mensaje' });
+    }
 });
 
 // Iniciar el servidor

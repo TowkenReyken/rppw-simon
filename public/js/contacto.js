@@ -1,4 +1,4 @@
-document.getElementById("formContacto").addEventListener("submit", function(event) {
+document.getElementById("formContacto").addEventListener("submit", async function(event) {
     event.preventDefault();
 
     const nombre = document.getElementById("nombre").value;
@@ -6,10 +6,22 @@ document.getElementById("formContacto").addEventListener("submit", function(even
     const asunto = document.getElementById("asunto").value;
     const mensaje = document.getElementById("mensaje").value;
 
-    // Aquí puedes agregar la lógica para enviar el formulario, por ejemplo, usando fetch para enviar los datos a tu servidor
-    console.log("Formulario enviado:", { nombre, email, asunto, mensaje });
+    try {
+        const response = await fetch("/api/contacto", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nombre, email, asunto, mensaje })
+        });
 
-    // Mostrar un mensaje de éxito o redirigir a otra página
-    alert("Gracias por contactarnos. Hemos recibido tu mensaje.");
-    document.getElementById("formContacto").reset();
+        const result = await response.json();
+        if (response.ok) {
+            alert("Gracias por contactarnos. Hemos recibido tu mensaje.");
+            document.getElementById("formContacto").reset();
+        } else {
+            alert(result.error || "Error al enviar el mensaje.");
+        }
+    } catch (error) {
+        console.error("Error al enviar el mensaje:", error);
+        alert("Ocurrió un error al enviar el mensaje.");
+    }
 });

@@ -69,18 +69,26 @@
 
       <label for="categoria">Categoría:</label>
       <select id="categoria" required>
-        <!-- Opciones dinámicas -->
+        <option value="">Selecciona una categoría</option>
+        <option value="1">Frutas</option>
+        <option value="2">Verduras</option>
+        <option value="3">Carnes</option>
+        <option value="4">Lácteos</option>
+        <option value="5">Panadería</option>
+        <option value="6">Enlatados</option>
+        <option value="7">Bebidas</option>
+        <option value="8">Limpieza</option>
+        <option value="9">Cuidado Personal</option>
+        <option value="10">Mascotas</option>
+        <option value="11">Dulces</option>
+        <option value="12">Condimentos y Especias</option>
+        <option value="13">Legumbres</option>
+        <option value="14">Cereales y Granola</option>
+        <option value="16">Pastas</option>
       </select>
 
       <label for="imagen">Imagen (URL):</label>
       <input type="text" id="imagen" placeholder="Ej: https://example.com/imagen.jpg" required>
-
-      <label for="metodo_calculo">Método de Cálculo:</label>
-      <select id="metodo_calculo" name="metodo_calculo" required>
-          <option value="cantidad" selected>Cantidad</option>
-          <option value="libras">Libras</option>
-          <option value="litros">Litros</option>
-      </select>
 
       <button type="submit" class="btn-guardar">Guardar</button>
     </form>
@@ -107,18 +115,26 @@
 
       <label for="editar-categoria">Categoría:</label>
       <select id="editar-categoria" required>
-        <!-- Opciones dinámicas -->
+        <option value="">Selecciona una categoría</option>
+        <option value="1">Frutas</option>
+        <option value="2">Verduras</option>
+        <option value="3">Carnes</option>
+        <option value="4">Lácteos</option>
+        <option value="5">Panadería</option>
+        <option value="6">Enlatados</option>
+        <option value="7">Bebidas</option>
+        <option value="8">Limpieza</option>
+        <option value="9">Cuidado Personal</option>
+        <option value="10">Mascotas</option>
+        <option value="11">Dulces</option>
+        <option value="12">Condimentos y Especias</option>
+        <option value="13">Legumbres</option>
+        <option value="14">Cereales y Granola</option>
+        <option value="16">Pastas</option>
       </select>
 
       <label for="editar-imagen">Imagen (URL):</label>
       <input type="text" id="editar-imagen" placeholder="Ej: https://example.com/imagen.jpg" required>
-
-      <label for="metodo_calculo">Método de Cálculo:</label>
-      <select id="metodo_calculo" name="metodo_calculo" required>
-          <option value="cantidad" selected>Cantidad</option>
-          <option value="libras">Libras</option>
-          <option value="litros">Litros</option>
-      </select>
 
       <button type="submit" class="btn-guardar">Guardar Cambios</button>
       <button type="button" class="btn-eliminar" onclick="eliminarProducto()">Eliminar Producto</button>

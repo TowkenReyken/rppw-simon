@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Pedidos</title>
     <link rel="stylesheet" href="/css/pedidos.css">
+    
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 </head>
 <body>
     <%- include('partials/header') %>
@@ -15,6 +17,19 @@
             <!-- Los pedidos se llenarán dinámicamente -->
         </div>
     </section>
+
+    <!-- Modal para motivo de no validación -->
+    <div id="modal-motivo" class="modal">
+      <div class="modal-content">
+        <span class="close" id="close-motivo">&times;</span>
+        <h2>Motivo de rechazo</h2>
+        <form id="form-motivo">
+          <label for="motivo-input">Indica el motivo por el que no se valida el pedido:</label>
+          <textarea id="motivo-input" rows="4" required style="width:100%;margin-bottom:15px;"></textarea>
+          <button type="submit" class="btn">Enviar</button>
+        </form>
+      </div>
+    </div>
 
     <%- include('partials/footer') %>
 

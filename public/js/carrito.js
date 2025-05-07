@@ -37,7 +37,11 @@ document.addEventListener('DOMContentLoaded', () => {
             productDiv.classList.add('cart-product');
             productDiv.innerHTML = `
                 <div class="info-cart-product">
-                    <span class="cantidad-producto-carrito">${product.quantity}x</span>
+                    <div class="cantidad-controls">
+                        <button class="btn-decrementar" data-id="${product.id}">-</button>
+                        <span class="cantidad-producto-carrito">${product.quantity}</span>
+                        <button class="btn-incrementar" data-id="${product.id}">+</button>
+                    </div>
                     <p class="titulo-producto-carrito">${product.title}</p>
                     <span class="precio-producto-carrito">$${(finalPrice * product.quantity).toFixed(2)}</span>
                 </div>
@@ -77,12 +81,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Manejar eliminación de productos del carrito
+    // Manejar eventos en el carrito
     rowProduct.addEventListener('click', (e) => {
+        // Eliminar producto
         if (e.target.classList.contains('icon-close')) {
             const id = e.target.dataset.id;
             allProducts = allProducts.filter(product => product.id !== id);
             updateCart();
+        }
+        // Aumentar cantidad
+        if (e.target.classList.contains('btn-incrementar')) {
+            const id = e.target.dataset.id;
+            const prod = allProducts.find(product => product.id === id);
+            if (prod) {
+                prod.quantity += 1;
+                updateCart();
+            }
+        }
+        // Disminuir cantidad
+        if (e.target.classList.contains('btn-decrementar')) {
+            const id = e.target.dataset.id;
+            const prod = allProducts.find(product => product.id === id);
+            if (prod && prod.quantity > 1) {
+                prod.quantity -= 1;
+                updateCart();
+            }
         }
     });
 

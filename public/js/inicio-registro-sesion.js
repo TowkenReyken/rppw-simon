@@ -69,12 +69,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
             });
-    
+
             const result = await response.json();
             if (response.ok) {
                 alert(result.message);
-                localStorage.setItem("token", result.token); // Guardar el token en localStorage
-                window.location.href = "/productos"; // Redirigir a productos
+                localStorage.setItem("token", result.token);
+                window.location.href = "/productos";
             } else {
                 alert(result.error);
             }

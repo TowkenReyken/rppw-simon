@@ -2,6 +2,7 @@
 function abrirFormulario() {
     const modal = document.getElementById("modalProducto");
     modal.style.display = "flex";
+    cargarCategorias(document.getElementById("categoria"));
 }
 
 // Cerrar el formulario modal para agregar producto
@@ -14,26 +15,37 @@ function cerrarFormulario() {
 function abrirFormularioEdicion(productId) {
     const modal = document.getElementById("modalEditarProducto");
     modal.style.display = "flex";
+    const selectCategoria = document.getElementById("editar-categoria");
 
-    // Obtener los datos del producto desde la tarjeta
-    const productoCard = document.querySelector(`.producto-card[data-id='${productId}']`);
-    const nombre = productoCard.dataset.nombre;
-    const precio = productoCard.dataset.precio;
-    const descuento = productoCard.dataset.descuento;
-    const stock = productoCard.dataset.stock;
-    const categoria = productoCard.dataset.categoria;
-    const imagen = productoCard.dataset.imagen;
+    // Cargar categorías y luego seleccionar la correcta
+    cargarCategorias(selectCategoria).then(() => {
+        // Obtener los datos del producto desde la tarjeta
+        const productoCard = document.querySelector(`.producto-card[data-id='${productId}']`);
+        const nombre = productoCard.dataset.nombre;
+        const precio = productoCard.dataset.precio;
+        const descuento = productoCard.dataset.descuento;
+        const stock = productoCard.dataset.stock;
+        const categoriaNombre = productoCard.dataset.categoria; // OJO: es el nombre, no el id
+        const imagen = productoCard.dataset.imagen;
 
-    // Llenar los campos del formulario con los datos del producto
-    document.getElementById("editar-nombre").value = nombre;
-    document.getElementById("editar-precio").value = precio;
-    document.getElementById("editar-descuento").value = descuento;
-    document.getElementById("editar-stock").value = stock;
-    document.getElementById("editar-categoria").value = categoria;
-    document.getElementById("editar-imagen").value = imagen;
+        // Llenar los campos del formulario con los datos del producto
+        document.getElementById("editar-nombre").value = nombre;
+        document.getElementById("editar-precio").value = precio;
+        document.getElementById("editar-descuento").value = descuento;
+        document.getElementById("editar-stock").value = stock;
+        document.getElementById("editar-imagen").value = imagen;
 
-    // Guardar el ID del producto en un atributo del formulario
-    document.getElementById("formEditarProducto").dataset.productId = productId;
+        // Seleccionar la opción correcta en el select por nombre
+        for (let option of selectCategoria.options) {
+            if (option.textContent === categoriaNombre) {
+                selectCategoria.value = option.value;
+                break;
+            }
+        }
+
+        // Guardar el ID del producto en un atributo del formulario
+        document.getElementById("formEditarProducto").dataset.productId = productId;
+    });
 }
 
 // Cerrar el formulario modal para editar producto
@@ -189,8 +201,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function cargarCategorias(selectElement) {
     try {
-        const response = await fetch('http://localhost:3001/src/categorias.php');
+        const response = await fetch('/src/categorias.php');
         const categorias = await response.json();
+
+        selectElement.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Selecciona una categoría';
+        selectElement.appendChild(defaultOption);
 
         categorias.forEach(categoria => {
             const option = document.createElement('option');
@@ -220,16 +238,15 @@ async function manejarFormularioProducto(event, url, method) {
     const precio = parseFloat(form.querySelector("[id$='precio']").value);
     const descuento = parseInt(form.querySelector("[id$='descuento']").value) || 0;
     const stock = parseInt(form.querySelector("[id$='stock']").value);
-    const categoria_id = parseInt(form.querySelector("[id$='categoria']").value);
+    const categoria_id = form.querySelector("[id$='categoria']").value;
     const imagen = form.querySelector("[id$='imagen']").value.trim();
-    const metodo_calculo = form.querySelector("[id$='metodo_calculo']").value;
 
-    if (!nombre || !precio || !categoria_id || !imagen || !stock || !metodo_calculo) {
-        alert("Todos los campos son obligatorios");
+    if (!nombre || isNaN(precio) || !categoria_id || !imagen || isNaN(stock)) {
+        alert("Todos los campos son obligatorios y deben ser válidos");
         return;
     }
 
-    const producto = { nombre, precio, descuento, stock, categoria_id, imagen, metodo_calculo };
+    const producto = { nombre, precio, descuento, stock, categoria_id, imagen };
 
     try {
         const response = await fetch(url, {
@@ -238,16 +255,17 @@ async function manejarFormularioProducto(event, url, method) {
             body: JSON.stringify(producto),
         });
 
+        const result = await response.json();
+
         if (response.ok) {
-            alert("Operación exitosa");
-            location.reload();
+            mostrarNotificacion(method === 'POST' ? 'Producto agregado correctamente' : 'Producto actualizado correctamente');
+            setTimeout(() => location.reload(), 1000);
         } else {
-            const error = await response.json();
-            alert(`Error: ${error.error}`);
+            throw new Error(result.error || 'Error desconocido');
         }
     } catch (error) {
         console.error("Error al enviar el formulario:", error);
-        alert("Ocurrió un error al enviar el formulario.");
+        alert(`Error: ${error.message}`);
     }
 }
 
@@ -260,3 +278,60 @@ document.getElementById("formEditarProducto").addEventListener("submit", (event)
     const productId = event.target.dataset.productId;
     manejarFormularioProducto(event, `/api/productos/${productId}`, "PUT");
 });
+
+function obtenerCategoriaIdPorNombre(nombre) {
+    const categorias = [
+        "Frutas", "Verduras", "Carnes", "Lácteos", "Panadería", "Enlatados", "Bebidas",
+        "Limpieza", "Cuidado Personal", "Mascotas", "Dulces", "Condimentos y Especias",
+        "Legumbres", "Cereales y Granola", "Pastas"
+    ];
+    // Los IDs deben coincidir con los de tu base de datos
+    const ids = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,16];
+    const idx = categorias.indexOf(nombre);
+    return idx !== -1 ? ids[idx] : null;
+}
+
+function mostrarNotificacion(mensaje, esError = false) {
+    const notificacion = document.createElement('div');
+    notificacion.className = `notificacion ${esError ? 'error' : 'exito'}`;
+    notificacion.textContent = mensaje;
+    document.body.appendChild(notificacion);
+    
+    setTimeout(() => {
+        notificacion.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+        notificacion.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notificacion);
+        }, 300);
+    }, 3000);
+}
+
+// Agrega este CSS para las notificaciones
+const style = document.createElement('style');
+style.textContent = `
+.notificacion {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+.notificacion.show {
+    transform: translateX(0);
+}
+.notificacion.exito {
+    background-color: #27ae60;
+}
+.notificacion.error {
+    background-color: #e74c3c;
+}
+`;
+document.head.appendChild(style);

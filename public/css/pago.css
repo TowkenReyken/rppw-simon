@@ -126,3 +126,15 @@
   .close:hover {
     color: #e74c3c;
   }
+  .btn-ver-comprobante {
+    background-color: #17a2b8;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-ver-comprobante:hover {
+    background-color: #138496;
+}

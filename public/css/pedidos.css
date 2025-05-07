@@ -22,6 +22,22 @@
 
 .pedido-info {
     flex: 1;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.pedido-info p {
+    margin-bottom: 5px;
+}
+
+.pedido-info strong {
+    font-weight: bold;
+    color: #333;
+}
+
+.pedido-info span {
+    font-size: 14px;
+    color: #666;
 }
 
 /* Botones en columna */
@@ -41,7 +57,9 @@
 
 .pedido-actions {
     display: flex;
+    flex-direction: column;
     gap: 10px;
+    align-items: flex-end;
 }
 
 button {
@@ -151,4 +169,71 @@ button.btn-cancelar {
 
 .close:hover {
     color: #e74c3c;
+}
+
+/* Badges para validación */
+.badge {
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+.badge-warning { background-color: #ffc107; color: #000; }
+.badge-success { background-color: #28a745; color: #fff; }
+.badge-danger { background-color: #dc3545; color: #fff; }
+
+/* Iconos en botones */
+button i {
+    margin-right: 5px;
+}
+
+/* Mensaje de error */
+.error-message {
+    color: #dc3545;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Estilo para el botón "Ver Comprobante" */
+.btn-ver-comprobante {
+    background-color: #17a2b8; /* Color azul claro */
+    color: white;
+    margin-top: 5px;
+}
+
+/* Ajustes para el modal del comprobante */
+.modal-content iframe {
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+/* Estilos para el modal del comprobante */
+.modal-comprobante .modal-content {
+    max-width: 90%;
+    max-height: 90vh;
+    overflow: auto;
+}
+
+.comprobante-viewer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.btn-download {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+.btn-download:hover {
+    background-color: #45a049;
+}
+
+.download-comprobante {
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 5px;
 }
