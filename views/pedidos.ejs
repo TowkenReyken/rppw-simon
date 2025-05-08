@@ -5,30 +5,91 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Pedidos</title>
     <link rel="stylesheet" href="/css/pedidos.css">
-    
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 </head>
 <body>
     <%- include('partials/header') %>
 
-    <section class="pedidos-container">
-        <h1>Gestión de Pedidos</h1>
-        <div id="pedidos-list">
-            <!-- Los pedidos se llenarán dinámicamente -->
-        </div>
-    </section>
+    <main class="main-container">
+        <section class="pedidos-container">
+            <h1>Gestión de Pedidos</h1>
+            
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label for="filter-status">Filtrar por estado:</label>
+                    <select id="filter-status" class="filter-select">
+                        <option value="all">Todos</option>
+                        <option value="Pendiente">Pendientes</option>
+                        <option value="En progreso">En progreso</option>
+                        <option value="Completado">Completados</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filter-validation">Filtrar por validación:</label>
+                    <select id="filter-validation" class="filter-select">
+                        <option value="all">Todos</option>
+                        <option value="valid">Válidos</option>
+                        <option value="invalid">No válidos</option>
+                        <option value="pending">Pendientes</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="pedidos-list">
+                <!-- Los pedidos se llenarán dinámicamente -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal para ver productos -->
+<div id="modal-productos" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Productos del Pedido</h2>
+        <div class="productos-list"></div>
+    </div>
+</div>
+
+<!-- Modal para ver comprobante -->
+<div id="modal-comprobante" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Comprobante de Pago</h2>
+        <div class="comprobante-viewer"></div>
+        <a href="#" class="btn-download" download>
+            <i class="fas fa-download"></i> Descargar Comprobante
+        </a>
+    </div>
+</div>
 
     <!-- Modal para motivo de no validación -->
     <div id="modal-motivo" class="modal">
-      <div class="modal-content">
-        <span class="close" id="close-motivo">&times;</span>
-        <h2>Motivo de rechazo</h2>
-        <form id="form-motivo">
-          <label for="motivo-input">Indica el motivo por el que no se valida el pedido:</label>
-          <textarea id="motivo-input" rows="4" required style="width:100%;margin-bottom:15px;"></textarea>
-          <button type="submit" class="btn">Enviar</button>
-        </form>
-      </div>
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Motivo de rechazo</h2>
+            <form id="form-motivo">
+                <label for="motivo-input">Indica el motivo por el que no se valida el pedido:</label>
+                <textarea id="motivo-input" rows="4" required></textarea>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Enviar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div id="modal-confirmar" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Confirmar acción</h2>
+            <p id="confirm-message">¿Estás seguro de que deseas realizar esta acción?</p>
+            <div class="modal-buttons">
+                <button id="confirm-action" class="btn btn-danger">Confirmar</button>
+                <button id="cancel-action" class="btn btn-secondary">Cancelar</button>
+            </div>
+        </div>
     </div>
 
     <%- include('partials/footer') %>
