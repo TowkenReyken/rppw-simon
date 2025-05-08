@@ -60,6 +60,22 @@ body {
     color: #e74c3c;
 }
 
+#fechaSorteo.admin-only {
+    display: none;
+}
+
+#fechaSorteo.admin-only.visible {
+    display: block;
+}
+
+.admin-only {
+    display: none;
+}
+
+.admin-only.visible {
+    display: block;
+}
+
 /* Media Queries */
 @media (max-width: 768px) {
     .sorteo-container {

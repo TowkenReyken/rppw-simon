@@ -288,3 +288,22 @@ header nav ul li a:hover {
         font-size: 25px; /* Ajustar el tamaño de los íconos en pantallas pequeñas */
     }
 }
+
+/* Estilos para elementos visibles solo para administradores */
+.admin-only {
+    display: none; /* Oculto por defecto */
+}
+
+/* Cuando el usuario es admin, se muestra a través de JavaScript */
+.admin-only.visible {
+    display: block;
+}
+
+/* Estilo especial para el enlace de admin */
+.admin-only a {
+    color: #e74c3c; /* Color distintivo para el enlace de admin */
+}
+
+.admin-only a:hover {
+    color: #c0392b;
+}

@@ -249,18 +249,19 @@ body {
 
 .modal-content {
     background-color: white;
-    margin: auto;
-    padding: 25px;
+    margin: 20px auto;
+    padding: 20px;
     border-radius: 10px;
-    width: 100%;
-    max-width: 600px;
+    width: 90%;
+    max-width: 400px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     position: relative;
     animation: slideDown 0.3s;
 }
 
 .modal-content h2 {
-    margin-bottom: 20px;
+    font-size: 1.4em;
+    margin-bottom: 15px;
     color: var(--dark-color);
     text-align: center;
 }
@@ -283,27 +284,56 @@ body {
 .productos-list {
     max-height: 400px;
     overflow-y: auto;
-    margin-bottom: 20px;
+    padding: 10px;
+    margin: -10px;
 }
 
 .producto-item {
     display: flex;
     justify-content: space-between;
-    padding: 10px;
+    align-items: center;
+    padding: 15px;
     border-bottom: 1px solid #eee;
-}
-
-.producto-item:last-child {
-    border-bottom: none;
+    background-color: white;
 }
 
 .producto-info {
     flex: 1;
+    padding-right: 15px;
+}
+
+.producto-info p {
+    margin: 5px 0;
+}
+
+.producto-nombre {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.producto-cantidad {
+    color: var(--gray-color);
+}
+
+.producto-precio {
+    color: var(--dark-color);
+}
+
+.producto-descuento {
+    color: var(--danger-color);
 }
 
 .producto-total {
-    font-weight: 600;
-    color: var(--dark-color);
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 1.1em;
+}
+
+.total-row {
+    background-color: #f8f9fa;
+    border-top: 2px solid #eee;
+    margin-top: 10px;
+    padding: 15px;
 }
 
 /* Comprobante viewer */
@@ -355,6 +385,12 @@ body {
     justify-content: center;
     gap: 15px;
     margin-top: 20px;
+}
+
+/* Ajustes del modal */
+#modal-productos .modal-content {
+    max-width: 500px;
+    padding: 25px;
 }
 
 /* Animaciones */
@@ -555,23 +591,23 @@ body {
 .cliente-info {
     background-color: #f8f9fa;
     padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
 }
 
 .cliente-info h3 {
     color: var(--dark-color);
+    font-size: 1.2em;
     margin-bottom: 10px;
-    font-size: 1.1em;
 }
 
 .cliente-info p {
     margin: 5px 0;
-    font-size: 0.9em;
+    color: var(--dark-color);
 }
 
 hr {
-    border: none;
-    border-top: 1px solid #ddd;
     margin: 15px 0;
+    border: none;
+    border-top: 1px solid #eee;
 }

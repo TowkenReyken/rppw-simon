@@ -35,12 +35,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: JSON.stringify(data),
             });
 
-            const result = await response.json();
             if (response.ok) {
+                const result = await response.json();
                 alert(result.message);
                 localStorage.setItem("token", result.token); // Guardar el token en localStorage
+                document.cookie = `token=${result.token}; path=/`;  // Añade esta línea
                 window.location.href = "/"; // Redirigir al inicio
             } else {
+                const result = await response.json();
                 alert(result.error);
             }
         } catch (error) {
@@ -70,12 +72,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: JSON.stringify(data),
             });
 
-            const result = await response.json();
             if (response.ok) {
+                const result = await response.json();
                 alert(result.message);
                 localStorage.setItem("token", result.token);
+                document.cookie = `token=${result.token}; path=/`;  // Añade esta línea
                 window.location.href = "/productos";
             } else {
+                const result = await response.json();
                 alert(result.error);
             }
         } catch (error) {

@@ -178,60 +178,85 @@ app.post('/api/register', async (req, res) => {
 
 // Ruta para iniciar sesión
 app.post('/api/login', async (req, res) => {
-  const { correo, contrasena } = req.body;
+    const { correo, contrasena } = req.body;
 
-  if (!correo || !contrasena) {
-    console.log('Faltan datos');
-    return res.status(400).json({ error: 'Correo y contraseña son obligatorios' });
-  }
-
-  try {
-    const query = `SELECT * FROM usuarios WHERE correo = $1`;
-    const result = await pool.query(query, [correo]);
-    console.log('Resultado de la consulta:', result.rows);
-
-    if (result.rows.length === 0) {
-      console.log('Usuario no encontrado');
-      return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
+    if (!correo || !contrasena) {
+        return res.status(400).json({ error: 'Correo y contraseña son requeridos' });
     }
 
-    const usuario = result.rows[0];
-    const isPasswordValid = await bcrypt.compare(contrasena, usuario.contrasena);
+    try {
+        // Buscar usuario y obtener su rol
+        const result = await pool.query(
+            'SELECT id, nombre, correo, contrasena, rol FROM usuarios WHERE correo = $1',
+            [correo]
+        );
 
-    if (!isPasswordValid) {
-      console.log('Contraseña incorrecta');
-      return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
+        if (result.rows.length === 0) {
+            return res.status(401).json({ error: 'Usuario no encontrado' });
+        }
+
+        const user = result.rows[0];
+        const validPassword = await bcrypt.compare(contrasena, user.contrasena);
+
+        if (!validPassword) {
+            return res.status(401).json({ error: 'Contraseña incorrecta' });
+        }
+
+        const token = jwt.sign(
+            { 
+                id: user.id, 
+                nombre: user.nombre,
+                correo: user.correo,
+                rol: user.rol  // Asegúrate de que este campo existe en la DB
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.json({ 
+            message: 'Inicio de sesión exitoso',
+            token,
+            user: {
+                nombre: user.nombre,
+                rol: user.rol
+            }
+        });
+    } catch (error) {
+        console.error('Error al iniciar sesión:', error);
+        res.status(500).json({ error: 'Error al iniciar sesión' });
     }
-
-    const token = jwt.sign(
-      { id: usuario.id, rol_id: usuario.rol_id, nombre: usuario.nombre },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    res.status(200).json({ message: 'Inicio de sesión exitoso', token });
-  } catch (error) {
-    console.error('Error al iniciar sesión:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
 });
 
 // Middleware para verificar el token
 function authenticateToken(req, res, next) {
-  const token = req.headers['authorization']?.split(' ')[1] || req.cookies.token;
-  if (!token) {
-    req.user = null; // Usuario no autenticado
-    return next();
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) {
-      req.user = null; // Token inválido
-      return next();
+    const token = req.cookies.token || req.headers['authorization']?.split(' ')[1];
+    
+    if (!token) {
+        req.user = null;
+        if (req.path === '/admin') {
+            return res.redirect('/inicio-registro-sesion');
+        }
+        return next();
     }
-    req.user = user; // Usuario autenticado
-    next();
-  });
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+        
+        // Si la ruta es /admin, verificar si el usuario es admin
+        if (req.path === '/admin' && req.user.rol !== 'admin') {
+            return res.redirect('/');
+        }
+        
+        next();
+    } catch (error) {
+        console.error('Error al verificar token:', error);
+        req.user = null;
+        if (req.path === '/admin') {
+            return res.redirect('/inicio-registro-sesion');
+        }
+        next();
+    }
 }
 
 // Ruta protegida para agregar productos
@@ -443,17 +468,13 @@ app.put('/api/pedidos/:id/validar', async (req, res) => {
     let { validacion, motivo } = req.body;
 
     try {
-        // Primero obtener el correo del usuario del pedido
+        // Obtener el correo del usuario del pedido
         const pedidoResult = await pool.query(
             'SELECT correo_usuario FROM pedidos WHERE id = $1',
             [id]
         );
 
-        if (!pedidoResult.rows[0]) {
-            return res.status(404).json({ error: 'Pedido no encontrado' });
-        }
-
-        const correoUsuario = pedidoResult.rows[0].correo_usuario;
+        const correoUsuario = pedidoResult.rows[0]?.correo_usuario;
 
         // Actualizar el pedido
         await pool.query(
@@ -461,9 +482,8 @@ app.put('/api/pedidos/:id/validar', async (req, res) => {
             [validacion, motivo, id]
         );
 
-        // Si el pedido no es válido, enviar correo
+        // Si el pedido no es válido, enviar correo al usuario
         if (validacion === false && correoUsuario) {
-            // Configurar el transporter de nodemailer
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
@@ -475,7 +495,6 @@ app.put('/api/pedidos/:id/validar', async (req, res) => {
                 }
             });
 
-            // Opciones del correo
             const mailOptions = {
                 from: process.env.EMAIL_USER,
                 to: correoUsuario,
@@ -492,15 +511,10 @@ app.put('/api/pedidos/:id/validar', async (req, res) => {
                 `
             };
 
-            // Enviar el correo
             await transporter.sendMail(mailOptions);
         }
 
-        res.json({ 
-            message: validacion 
-                ? 'Pedido validado exitosamente' 
-                : 'Pedido marcado como no válido y se ha enviado una notificación al cliente'
-        });
+        res.json({ message: 'Pedido actualizado exitosamente' });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Error al actualizar el pedido' });
@@ -587,6 +601,144 @@ app.post('/api/contacto', async (req, res) => {
     } catch (error) {
         console.error('Error al enviar el correo de contacto:', error);
         res.status(500).json({ error: 'Error al enviar el mensaje' });
+    }
+});
+
+// Ruta para el panel de administración
+app.get('/admin', authenticateToken, async (req, res) => {
+    try {
+        // Obtener estadísticas básicas
+        const [pedidos, productos, usuarios] = await Promise.all([
+            pool.query('SELECT COUNT(*) FROM pedidos'),
+            pool.query('SELECT COUNT(*) FROM productos'),
+            pool.query('SELECT COUNT(*) FROM usuarios')
+        ]);
+
+        const stats = {
+            totalPedidos: parseInt(pedidos.rows[0].count),
+            totalProductos: parseInt(productos.rows[0].count),
+            totalUsuarios: parseInt(usuarios.rows[0].count)
+        };
+
+        res.render('admin', { 
+            user: req.user,
+            stats: stats 
+        });
+    } catch (error) {
+        console.error('Error al cargar estadísticas:', error);
+        res.render('admin', { 
+            user: req.user,
+            stats: {
+                totalPedidos: 0,
+                totalProductos: 0,
+                totalUsuarios: 0
+            }
+        });
+    }
+});
+
+// API para obtener estadísticas del dashboard
+app.get('/api/admin/estadisticas', authenticateToken, async (req, res) => {
+    if (req.user.rol !== 'admin') {
+        return res.status(403).json({ error: 'No autorizado' });
+    }
+
+    try {
+        const [pedidos, productos, usuarios, ventasMes, productosPorCategoria] = await Promise.all([
+            pool.query('SELECT COUNT(*) FROM pedidos'),
+            pool.query('SELECT COUNT(*) FROM productos'),
+            pool.query('SELECT COUNT(*) FROM usuarios'),
+            pool.query(`
+                SELECT COALESCE(SUM(
+                    (p->>'price')::numeric * (p->>'quantity')::numeric
+                ), 0) as total
+                FROM pedidos, jsonb_array_elements(productos::jsonb) p
+                WHERE DATE_TRUNC('month', fecha) = DATE_TRUNC('month', CURRENT_DATE)
+            `),
+            pool.query(`
+                WITH all_categories AS (
+                    SELECT id, nombre 
+                    FROM categoria 
+                    ORDER BY nombre
+                )
+                SELECT 
+                    c.nombre as categoria,
+                    COUNT(p.id) as cantidad
+                FROM all_categories c
+                LEFT JOIN productos p ON c.id = p.categoria_id
+                GROUP BY c.id, c.nombre
+                ORDER BY c.nombre
+            `)
+        ]);
+
+        res.json({
+            totalPedidos: parseInt(pedidos.rows[0].count),
+            totalProductos: parseInt(productos.rows[0].count),
+            totalUsuarios: parseInt(usuarios.rows[0].count),
+            ventasMes: parseFloat(ventasMes.rows[0].total || 0),
+            productosPorCategoria: productosPorCategoria.rows
+        });
+    } catch (error) {
+        console.error('Error al obtener estadísticas:', error);
+        res.status(500).json({ error: 'Error al obtener estadísticas' });
+    }
+});
+
+// Ruta para obtener todos los usuarios
+app.get('/api/usuarios', authenticateToken, async (req, res) => {
+    if (req.user.rol !== 'admin') {
+        return res.status(403).json({ error: 'No autorizado' });
+    }
+
+    try {
+        const result = await pool.query('SELECT id, nombre, correo, direccion, telefono, rol FROM usuarios');
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Error al obtener usuarios' });
+    }
+});
+
+// Ruta para eliminar usuario
+app.delete('/api/usuarios/:id', authenticateToken, async (req, res) => {
+    if (req.user.rol !== 'admin') {
+        return res.status(403).json({ error: 'No autorizado' });
+    }
+
+    const { id } = req.params;
+
+    try {
+        await pool.query('DELETE FROM usuarios WHERE id = $1', [id]);
+        res.json({ message: 'Usuario eliminado exitosamente' });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Error al eliminar usuario' });
+    }
+});
+
+// Ruta para actualizar el rol de un usuario
+app.put('/api/usuarios/:id/rol', authenticateToken, async (req, res) => {
+    if (req.user.rol !== 'admin') {
+        return res.status(403).json({ error: 'No autorizado' });
+    }
+
+    const { id } = req.params;
+    const { rol } = req.body;
+
+    if (!rol || !['admin', 'cliente'].includes(rol)) {
+        return res.status(400).json({ error: 'Rol inválido' });
+    }
+
+    try {
+        await pool.query(
+            'UPDATE usuarios SET rol = $1 WHERE id = $2',
+            [rol, id]
+        );
+
+        res.json({ message: 'Rol actualizado correctamente' });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Error al actualizar el rol' });
     }
 });
 

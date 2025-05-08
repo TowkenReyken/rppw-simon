@@ -3,9 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalPago = document.getElementById('total-pago');
     const btnConfirmarPago = document.getElementById('btn-confirmar-pago');
     const modal = document.getElementById('modal-confirmar');
-    const closeModal = document.querySelector('.close');
+    const closeModal = modal.querySelector('.close');
+    const btnCancelar = modal.querySelector('.btn-cancelar');
     const metodoPagoSelect = document.getElementById('metodo-pago');
     const comprobanteContainer = document.getElementById('comprobante-container');
+    const form = document.getElementById('confirmar-compra-form');
 
     // Cargar carrito desde localStorage
     let carrito = cargarCarrito();
@@ -20,13 +22,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event listeners
     btnConfirmarPago.addEventListener('click', () => modal.style.display = 'flex');
-    closeModal.addEventListener('click', () => modal.style.display = 'none');
+    closeModal.addEventListener('click', () => {
+        modal.style.display = 'none';
+        form.reset();
+    });
+    btnCancelar.addEventListener('click', () => {
+        modal.style.display = 'none';
+        form.reset();
+    });
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            form.reset();
+        }
+    });
     metodoPagoSelect.addEventListener('change', () => {
-        comprobanteContainer.style.display = metodoPagoSelect.value === 'Transferencia' ? 'block' : 'none';
+        if (metodoPagoSelect.value === 'Transferencia') {
+            comprobanteContainer.style.display = 'block';
+            comprobanteContainer.classList.add('visible');
+        } else {
+            comprobanteContainer.style.display = 'none';
+            comprobanteContainer.classList.remove('visible');
+        }
     });
 
+    // Validación en tiempo real
+    const inputs = form.querySelectorAll('input[required], select[required]');
+    inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            validateInput(input);
+        });
+
+        input.addEventListener('blur', () => {
+            validateInput(input);
+        });
+    });
+
+    function validateInput(input) {
+        const validationMessage = input.parentElement.querySelector('.validation-message') 
+            || document.createElement('div');
+        
+        validationMessage.className = 'validation-message';
+
+        if (!input.value.trim()) {
+            validationMessage.textContent = 'Este campo es requerido';
+            validationMessage.classList.add('visible');
+            input.parentElement.appendChild(validationMessage);
+        } else {
+            validationMessage.classList.remove('visible');
+        }
+    }
+
     // Manejar envío del formulario
-    document.getElementById('confirmar-compra-form').addEventListener('submit', async (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
         await procesarPago();
     });
@@ -139,14 +187,15 @@ async function confirmarCompra(clienteNombre, clienteDireccion, clienteCorreo, c
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Error al crear el pedido');
+            throw new Error('Error al procesar el pedido');
         }
 
         // Éxito
         localStorage.removeItem('carrito');
         mostrarMensaje('¡Compra confirmada! Redirigiendo...', 'success');
-        setTimeout(() => window.location.href = '/pedidos', 2000);
+        
+        // Cambiamos la redirección a la página de productos
+        setTimeout(() => window.location.href = '/productos', 2000);
     } catch (error) {
         console.error('Error al confirmar compra:', error);
         mostrarMensaje(error.message || 'Ocurrió un error al confirmar la compra', 'error');

@@ -3,42 +3,40 @@ document.addEventListener("DOMContentLoaded", () => {
     const userDropdown = document.getElementById("user-dropdown");
     const logoutButton = document.getElementById("logout-button");
     const userStatus = document.getElementById("user-status");
-
-    const userId = localStorage.getItem("userId");
-if (userId) {
-  // mostrar el nombre del usuario en la barra de navegación
-  userStatus.textContent = `Bienvenido, ${userId}`;
-}
+    const adminElements = document.querySelectorAll('.admin-only');
 
     // Verificar si el usuario está logueado
     const token = localStorage.getItem("token");
     if (token) {
         try {
-            const payload = JSON.parse(atob(token.split('.')[1])); // Decodificar el payload del token
-            const userName = payload.nombre || "Usuario"; // Obtener el nombre del usuario del token
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const userName = payload.nombre || "Usuario";
+            const isAdmin = payload.rol === "admin";
 
-            // Mostrar el nombre del usuario junto al punto verde
-            userStatus.classList.add("logged-in"); // Mostrar el indicador de estado
-            userStatus.textContent = userName; // Agregar el nombre del usuario
+            // Mostrar el nombre del usuario y el punto verde
+            userStatus.classList.add("logged-in");
+            userStatus.textContent = userName;
 
-            if (payload.rol_id === 2) {
-                // Mostrar opciones específicas para administradores
-                const adminLink = document.createElement('li');
-                adminLink.innerHTML = '<a href="/admin">Panel de Administración</a>';
-                userDropdown.insertBefore(adminLink, logoutButton.parentElement);
-            }
+            // Mostrar/ocultar elementos de admin
+            adminElements.forEach(element => {
+                element.style.display = isAdmin ? 'block' : 'none';
+            });
 
-            userLink.href = "#"; // Deshabilitar el enlace al inicio de sesión
-            userDropdown.classList.add("hidden"); // Asegurar que el menú esté cerrado por defecto
+            userLink.href = "#";
+            userDropdown.classList.add("hidden");
         } catch (error) {
             console.error("Error al decodificar el token:", error);
-            localStorage.removeItem("token"); // Eliminar el token si es inválido
+            localStorage.removeItem("token");
         }
     } else {
-        userDropdown.classList.add("hidden"); // Ocultar el menú desplegable
-        userLink.href = "/inicio-registro-sesion"; // Redirigir al inicio de sesión
-        userStatus.classList.remove("logged-in"); // Ocultar el indicador de estado
-        userStatus.textContent = ""; // Limpiar el texto del estado
+        // Usuario no logueado
+        adminElements.forEach(element => {
+            element.style.display = 'none';
+        });
+        userDropdown.classList.add("hidden");
+        userLink.href = "/inicio-registro-sesion";
+        userStatus.classList.remove("logged-in");
+        userStatus.textContent = "";
     }
 
     // Mostrar/ocultar el menú desplegable al hacer clic en el ícono de usuario

@@ -2,6 +2,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const inputFecha = document.getElementById("fechaSorteo");
     const contador = document.getElementById("contador");
 
+    // Verificar si es admin
+    const token = localStorage.getItem("token");
+    if (token) {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const isAdmin = payload.rol === "admin";
+            
+            // Solo mostrar el input si es admin
+            if (isAdmin) {
+                inputFecha.style.display = 'block';
+            }
+        } catch (error) {
+            console.error("Error al decodificar el token:", error);
+        }
+    }
+
     // Cargar fecha guardada en localStorage
     if (localStorage.getItem("fechaSorteo")) {
         inputFecha.value = localStorage.getItem("fechaSorteo");

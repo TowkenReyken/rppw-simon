@@ -335,3 +335,31 @@ style.textContent = `
 }
 `;
 document.head.appendChild(style);
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // Verificar rol de usuario
+    function isAdmin() {
+        const token = localStorage.getItem('token');
+        if (!token) return false;
+        
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.rol === "admin"; // Cambio aquí
+        } catch (error) {
+            console.error('Error al verificar rol:', error);
+            return false;
+        }
+    }
+
+    // Mostrar/ocultar elementos según el rol
+    function setupAdminElements() {
+        const adminElements = document.querySelectorAll('.admin-only');
+        const isUserAdmin = isAdmin();
+        
+        adminElements.forEach(element => {
+            element.style.display = isUserAdmin ? 'block' : 'none';
+        });
+    }
+
+    setupAdminElements();
+});

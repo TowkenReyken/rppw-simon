@@ -11,7 +11,10 @@
 
   <section class="productos-container">
     <h1>Nuestros Productos</h1>
-    <button class="btn-agregar" onclick="abrirFormulario()">Agregar Producto</button>
+    <!-- Botón agregar producto (solo visible para administradores) -->
+    <% if (user && user.rol === "admin") { %>
+        <button class="btn-agregar" onclick="abrirFormulario()">Agregar Producto</button>
+    <% } %>
 
     <!-- Campo de búsqueda -->
     <form id="search-form" action="/productos" method="GET" class="search-form">
@@ -41,7 +44,7 @@
                 <button class="btn-add-cart">
                     <i class='bx bx-cart-add'></i> Agregar al carrito
                 </button>
-                <button class="btn-edit-product" onclick="abrirFormularioEdicion('<%= producto.id %>')">
+                <button class="btn-edit-product admin-only" onclick="abrirFormularioEdicion('<%= producto.id %>')">
                     <i class='bx bx-pencil'></i>
                 </button>
             </div>
