@@ -443,13 +443,17 @@ app.put('/api/pedidos/:id/validar', async (req, res) => {
     let { validacion, motivo } = req.body;
 
     try {
-        // Obtener el correo del usuario del pedido
+        // Primero obtener el correo del usuario del pedido
         const pedidoResult = await pool.query(
             'SELECT correo_usuario FROM pedidos WHERE id = $1',
             [id]
         );
 
-        const correoUsuario = pedidoResult.rows[0]?.correo_usuario;
+        if (!pedidoResult.rows[0]) {
+            return res.status(404).json({ error: 'Pedido no encontrado' });
+        }
+
+        const correoUsuario = pedidoResult.rows[0].correo_usuario;
 
         // Actualizar el pedido
         await pool.query(
@@ -457,8 +461,9 @@ app.put('/api/pedidos/:id/validar', async (req, res) => {
             [validacion, motivo, id]
         );
 
-        // Si el pedido no es válido, enviar correo al usuario
+        // Si el pedido no es válido, enviar correo
         if (validacion === false && correoUsuario) {
+            // Configurar el transporter de nodemailer
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
@@ -470,6 +475,7 @@ app.put('/api/pedidos/:id/validar', async (req, res) => {
                 }
             });
 
+            // Opciones del correo
             const mailOptions = {
                 from: process.env.EMAIL_USER,
                 to: correoUsuario,
@@ -486,10 +492,15 @@ app.put('/api/pedidos/:id/validar', async (req, res) => {
                 `
             };
 
+            // Enviar el correo
             await transporter.sendMail(mailOptions);
         }
 
-        res.json({ message: 'Pedido actualizado exitosamente' });
+        res.json({ 
+            message: validacion 
+                ? 'Pedido validado exitosamente' 
+                : 'Pedido marcado como no válido y se ha enviado una notificación al cliente'
+        });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Error al actualizar el pedido' });
