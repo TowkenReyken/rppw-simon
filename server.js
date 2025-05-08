@@ -301,54 +301,107 @@ app.delete('/api/productos/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// Ruta para obtener todos los pedidos
 app.get('/api/pedidos', async (req, res) => {
-  try {
-      const query = `
-          SELECT *, comprobante_path FROM pedidos
-          ORDER BY 
-              CASE 
-                  WHEN estado = 'Pendiente' THEN 1
-                  WHEN estado = 'En progreso' THEN 2
-                  WHEN estado = 'Completado' THEN 3
-              END,
-              fecha ASC
-      `;
-      const result = await pool.query(query);
-      res.json(result.rows);
-  } catch (error) {
-      console.error('Error al obtener pedidos:', error);
-      res.status(500).json({ error: 'Error al obtener pedidos' });
-  }
+    try {
+        const query = `
+            WITH pedido_productos AS (
+                SELECT 
+                    p.id,
+                    jsonb_agg(
+                        jsonb_build_object(
+                            'id', prod.id,
+                            'nombre', prod.nombre,
+                            'precio', prod.precio,
+                            'descuento', prod.descuento,
+                            'imagen', prod.imagen,
+                            'quantity', (pd->>'quantity')::int,
+                            'title', pd->>'title'
+                        )
+                    ) as productos_detallados
+                FROM pedidos p
+                CROSS JOIN jsonb_array_elements(p.productos::jsonb) pd
+                LEFT JOIN productos prod ON (pd->>'id')::int = prod.id
+                GROUP BY p.id
+            )
+            SELECT 
+                p.*,
+                u.correo AS cliente_correo,
+                COALESCE(pp.productos_detallados, '[]'::jsonb) as productos_detallados
+            FROM pedidos p
+            LEFT JOIN usuarios u ON p.cliente_nombre = u.nombre AND p.cliente_direccion = u.direccion
+            LEFT JOIN pedido_productos pp ON p.id = pp.id
+            ORDER BY 
+                CASE 
+                    WHEN p.estado = 'Pendiente' THEN 1
+                    WHEN p.estado = 'En progreso' THEN 2
+                    WHEN p.estado = 'Completado' THEN 3
+                END,
+                p.fecha DESC
+        `;
+        
+        const result = await pool.query(query);
+        const pedidos = result.rows.map(pedido => ({
+            ...pedido,
+            productos: pedido.productos_detallados
+        }));
+        
+        res.json(pedidos);
+    } catch (error) {
+        console.error('Error al obtener pedidos:', error);
+        res.status(500).json({ error: 'Error al obtener pedidos' });
+    }
 });
-
 
 // Ruta para agregar un nuevo pedido
 app.post('/api/pedidos', async (req, res) => {
-  const { cliente_nombre, cliente_direccion, metodo_pago, productos, comprobante_path } = req.body;
+    const { 
+        cliente_nombre, 
+        cliente_direccion, 
+        correo_usuario, 
+        tel_usuario, 
+        metodo_pago, 
+        productos, 
+        comprobante_path 
+    } = req.body;
 
-  if (!cliente_nombre || !cliente_direccion || !metodo_pago || !productos || productos.length === 0) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+    if (!cliente_nombre || !cliente_direccion || !correo_usuario || !tel_usuario || !metodo_pago || !productos || productos.length === 0) {
+        return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
-  try {
-      const query = `
-          INSERT INTO pedidos (cliente_nombre, cliente_direccion, metodo_pago, productos, comprobante_path)
-          VALUES ($1, $2, $3, $4, $5)
-      `;
-      const values = [
-          cliente_nombre,
-          cliente_direccion,
-          metodo_pago,
-          JSON.stringify(productos),
-          comprobante_path // Añadir esta línea
-      ];
-      await pool.query(query, values);
-      res.status(201).json({ message: 'Pedido creado exitosamente.' });
-  } catch (error) {
-      console.error('Error al crear pedido:', error);
-      res.status(500).json({ error: 'Error al crear pedido.' });
-  }
+    try {
+        const result = await pool.query(
+            `INSERT INTO pedidos (
+                cliente_nombre, 
+                cliente_direccion, 
+                correo_usuario, 
+                tel_usuario, 
+                metodo_pago, 
+                productos, 
+                comprobante_path, 
+                estado, 
+                fecha
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+            RETURNING id`,
+            [
+                cliente_nombre, 
+                cliente_direccion, 
+                correo_usuario, 
+                tel_usuario, 
+                metodo_pago, 
+                JSON.stringify(productos), 
+                comprobante_path, 
+                'Pendiente'
+            ]
+        );
+
+        res.status(201).json({ 
+            message: 'Pedido creado exitosamente', 
+            id: result.rows[0].id 
+        });
+    } catch (error) {
+        console.error('Error al crear pedido:', error);
+        res.status(500).json({ error: 'Error al crear el pedido' });
+    }
 });
 
 // Ruta para actualizar el estado de un pedido
@@ -389,81 +442,57 @@ app.put('/api/pedidos/:id/validar', async (req, res) => {
     const { id } = req.params;
     let { validacion, motivo } = req.body;
 
-    // Forzar el valor booleano o null
-    if (validacion === "false" || validacion === false) {
-        validacion = false;
-    } else if (validacion === "true" || validacion === true) {
-        validacion = true;
-    } else {
-        validacion = null;
-    }
-
     try {
-        // Actualizar el campo de validación
-        await pool.query(
-            'UPDATE pedidos SET validacion = $1 WHERE id = $2',
-            [validacion, id]
+        // Obtener el correo del usuario del pedido
+        const pedidoResult = await pool.query(
+            'SELECT correo_usuario FROM pedidos WHERE id = $1',
+            [id]
         );
 
-        // Si se marca como "No válido", eliminar comprobante y enviar email
-        if (validacion === false || validacion === "false") {
-            // Obtener comprobante_path y correo del cliente
-            const result = await pool.query(
-                'SELECT comprobante_path, cliente_nombre, cliente_direccion, metodo_pago, cliente_correo FROM pedidos WHERE id = $1',
-                [id]
-            );
-            const pedido = result.rows[0];
-            const comprobantePath = pedido?.comprobante_path;
-            const correoCliente = pedido?.cliente_correo;
+        const correoUsuario = pedidoResult.rows[0]?.correo_usuario;
 
-            // Eliminar comprobante si existe (como ya tienes)
-            if (comprobantePath) {
-                const fileName = path.basename(comprobantePath);
-                const filePath = path.join(__dirname, 'uploads', fileName);
-                fs.unlink(filePath, (err) => {
-                    if (err) console.error('Error al eliminar comprobante:', err);
-                });
-                await pool.query(
-                    'UPDATE pedidos SET comprobante_path = NULL WHERE id = $1',
-                    [id]
-                );
-            }
+        // Actualizar el pedido
+        await pool.query(
+            'UPDATE pedidos SET validacion = $1, motivo_rechazo = $2 WHERE id = $3',
+            [validacion, motivo, id]
+        );
 
-            // Enviar email al cliente
-            if (correoCliente) {
-                // Configura tu transportador de nodemailer
-                const transporter = nodemailer.createTransport({
-                    service: 'gmail', // O el servicio que uses
-                    auth: {
-                        user: process.env.EMAIL_USER, // Pon tu correo en .env
-                        pass: process.env.EMAIL_PASS  // Pon tu contraseña en .env
-                    },
-                    tls: {
-                        rejectUnauthorized: false // <-- Agrega esta línea
-                    }
-                });
+        // Si el pedido no es válido, enviar correo al usuario
+        if (validacion === false && correoUsuario) {
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS
+                },
+                tls: {
+                    rejectUnauthorized: false
+                }
+            });
 
-                const mailOptions = {
-                    from: process.env.EMAIL_USER,
-                    to: correoCliente,
-                    subject: 'Pedido No Validado - Supermercado Simón',
-                    text: `Hola, tu pedido no pudo ser validado por el siguiente motivo:\n\n${motivo}\n\nSi tienes dudas, contáctanos.`
-                };
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: correoUsuario,
+                subject: 'Pedido no validado - Supermercado Simón',
+                html: `
+                    <h2>Tu pedido no ha sido validado</h2>
+                    <p>Estimado cliente,</p>
+                    <p>Lamentamos informarte que tu pedido no ha sido validado por el siguiente motivo:</p>
+                    <p><strong>${motivo}</strong></p>
+                    <p>Por favor, contacta con nosotros para más información.</p>
+                    <br>
+                    <p>Atentamente,</p>
+                    <p>Supermercado Simón</p>
+                `
+            };
 
-                transporter.sendMail(mailOptions, (error, info) => {
-                    if (error) {
-                        console.error('Error al enviar email:', error);
-                    } else {
-                        console.log('Email enviado:', info.response);
-                    }
-                });
-            }
+            await transporter.sendMail(mailOptions);
         }
 
-        res.status(200).json({ message: 'Validación actualizada correctamente' });
+        res.json({ message: 'Pedido actualizado exitosamente' });
     } catch (error) {
-        console.error('Error al validar pedido:', error);
-        res.status(500).json({ error: 'Error al validar pedido' });
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Error al actualizar el pedido' });
     }
 });
 
